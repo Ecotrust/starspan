@@ -1,0 +1,83 @@
+BUILD on windows
+$Id: BUILD.windows.txt,v 1.3 2008-03-28 01:30:06 crueda Exp $
+
+2008-03-27
+    See http://starspan.casil.ucdavis.edu/doku/doku.php?id=mingw
+    
+    
+2007-10-19
+	- Windows version with LFS is now successful
+	TODO: update this notes accordingly.
+
+
+
+2005-06-13
+	Now attempting under MinGW: MSYS 1.0.10  MinGW 4.1.0
+	
+	GEOS 2.1.2: I only needed to change source/test/XMLTester.cpp
+	so that Polygon is qualified when used. The two lines changed
+	now read as follows:
+	
+	line 49:    //using geos::Polygon; // for mingw ...
+	line 454:   vector<geos::Polygon *>*polys = ....
+	
+	Then, the standard steps:
+		./configure
+		make          # OK
+		make install  # OK
+		
+		# then, make .dll
+		cd /usr/local/lib
+		g++ ....  need to recall this command
+		# then I got libgeos.dll
+		rm libgeos.a libgeos.la  # otherwise gdal build will complain
+		                         # about not finding the dynamic libraries
+		
+	GDAL 1.2.6:
+	
+		./configure --without-unix-stdio-64 --with-jpeg=no
+		make          # library OK, but some apps fail...
+		make install  # OK
+		
+		--without-unix-stdio-64: because MinGW is actually not a supported
+		build environment for GDAL
+		
+		--with-jpeg=no:  my quick fix since I was getting some errors
+		related to JPEG support.
+		
+		
+	StarSpan 0.993:
+		./configure
+		make
+		make install
+		# OK!
+		
+		By setting the PATH environment variable according to the location
+		of the .dll's and starspan2 binary, StarSpan	can now be executed
+		in a Windows Command window.
+		
+		GUI interface: However, there are some synchronization problems
+		in some preliminary tests using the GUI. More tests and adjustments
+		are necessary.
+		
+
+		
+		
+2005-04-04
+	
+	Attempting to build on windows/cygwin again:
+	
+		GEOS 2.1.1: I only needed to specify 
+		extern "C" { #include <ieeefp.h> }
+		in geos/platform.h and compilation goes fine.
+		
+		GDAL 1.2.6: ... problems at linking stage: it cannot
+		find some geos::WKT... stuff  :-(
+		Then I tried with mingw as indicated in gdal.org.faq.html
+		and it compiled fine.
+		
+		starspan 0.962beta: Compiles but fails with many unresolved 
+		link symbols. I guess it's because of the mixing of library
+		modes... I'd need to check this again later when I have more
+		time.
+

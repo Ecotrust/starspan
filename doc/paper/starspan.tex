@@ -1,0 +1,375 @@
+%%
+%% starspan paper
+%% Carlos A. Rueda-Velasquez
+%% Jonathan E. Greenberg
+%% Susan L. Ustin
+%% $Id: starspan.tex,v 1.6 2005-03-23 22:35:32 crueda Exp $
+
+\documentclass{elsart}
+\usepackage{natbib,url,amssymb}
+
+\journal{Computers \& Geosciences}
+
+
+\begin{document}
+\begin{frontmatter}
+
+\title{STARSPAN: 
+A Tool for Fast Selective Pixel Extraction 
+from Remotely Sensed Data}
+\thanks[label1]{Available from \url{http://starspan.casil.ucdavis.edu}}
+
+\author{Carlos A. Rueda\corauthref{cor}},
+\corauth[cor]{Corresponding author.}
+\ead{carueda@ucdavis.edu}
+\author{Jonathan E. Greenberg\thanksref{greenberg}},
+\thanks[greenberg]{Present address: NASA Ames Research Center...}
+\ead{greenberg@ucdavis.edu}
+\author{Susan L. Ustin}
+\ead{slustin@ucdavis.edu}
+
+\address{Center for Spatial Technologies and Remote Sensing (CSTARS).
+The Barn. University of California, Davis. One Shields Avenue, Davis, CA 95616}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract}
+	
+	Many research endeavours in environmental and ecological
+	sciences [[?]] involve the utilization of a combined GIS
+	and remote sensing approach. As the amount of data is
+	steadily increasing due to the availability of more
+	instruments as well as improved spatio-temporal-spectral
+	resolutions, the risk for bottlenecks in data management
+	and processing is also becoming a more important
+	consideration that must be properly addressed for timely
+	processing and results. Although there exist computer
+	applications to help the scientist in these endeavours,
+	there is an apparent absence of specific tools to
+	integrate information from both GIS and remote sensing
+	sources. In this paper we describe STARSPAN, a computer
+	program focused on a specific yet crucial aspect of data
+	integration which is the extraction of pixel data from
+	spectral raster images according to specified geometry
+	features. Development of the tool started as part of a
+	project for mapping invasive plant species in the
+	Sacramento-San Joaquin Delta Region (approximately
+	$3400$~km$^2$ in California's Central Valley) using
+	field data and airborne hyperspectral imagery. STARSPAN
+	is an open source project implemented in C++ and
+	developed under object-oriented design principles so it
+	can be extended with new functionalities. It can be
+	freely downloaded from
+	\url{http://starspan.casil.ucdavis.edu}. In the context
+	of real examples, we explain the usage of the tool, how
+	it can be extended, and discuss further directions for
+	its improvement.
+	
+	
+\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{keyword}
+GIS \sep remote sensing \sep image processing
+% PACS codes here, in the form: \PACS code \sep code
+\end{keyword}
+
+\end{frontmatter}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}\label{intro}
+
+
+To meet evolving challenges in performing digital remote
+sensing analysis, images are becoming significantly larger
+and the algorithms to analyze the data are becoming much
+more complex. Aerial and spaceborne sensors are generating
+imagery with increasing spatial, spectral, radiometric and
+temporal resolution, and multiple image datasets (used
+either for multitemporal analysis or mosaicking to increase
+spatial extent) are become more frequent in the literature
+(CITATIONS). While computers are becoming more powerful,
+image analysis software has been lagging in novel ways of
+dealing with large-dataset analyses. We present a new
+approach to performing classification and biophysical
+parameter analysis which can greatly speed up the time it
+takes to investigate multiple, potentially complex, analysis
+techniques and perform validation.
+	
+Image analysis, broadly, typically follows three major
+steps: 1) collection of training and test data, 2) perform
+relevant transforms on the image data (e.g. calculation of
+spectral indices or application of texture filters), 3)
+application of training data to the particular analysis
+(either classification algorithms, or statistical
+relationships between spectral transforms and some
+biophysical variable of interest), and 4) validation of the
+analysis using independent test data. The ultimate goal is
+often to use the best analysis algorithm selected from
+multiple different approaches and produce an accurate map of
+the classes or biophysical variable of interest. Training
+and test data are pixels or collections of pixels (with all
+associated z-profile information) of which the class or
+biophysical variable of interest is known. These can be
+collected through field data collection (typically in
+conjunction with a GPS) or through manual selection of
+pixels based on user knowledge of the site. Traditionally,
+major image analysis packages (e.g. RSI ENVI, Erdas Imagine,
+PCI Geomatica, GRASS GIS) require the user to perform the
+most computationally limiting steps, steps 2 and 3, on the
+entire image or images in order to determine if a particular
+image transform and image analysis methodology will yield
+sufficiently accurate results. If new transforms or analyses
+are warranted, the entire image must be processed again.
+With large datasets this is computationally expensive and
+requires a significant amount of storage space, particularly
+when image transforms are involved.
+	
+We make the observation that when performing image analysis,
+only an extremely small fraction of pixels (usually
+numbering in the thousands) are actually useful to make
+decisions on accuracy, since only a small fraction would
+have been visited in the field. As such, we have developed a
+technique to extract pixel data from only known sites,
+perform both spectral and spatial transforms on these data,
+classify/determine biophysical variables, and perform
+accuracy assessment. Only once the ?correct? combination of
+image transforms and analysis algorithms has been determined
+is it necessary to actually apply these to an entire image.
+
+	%%%%%%%%%%
+
+STARSPAN is an open source computer program developed at
+Center of Spatial Technologies and Remote Sensing (CSTARS)
+for fast and flexible extraction of pixel data from spectral
+raster images. The tool was developed as part of a project
+for mapping invasive plant species using hyperspectral
+imagery \citep{ustin04}.
+	
+Main inputs for the program are one or multiple raster files
+and a vector file defining a set of geometry features. The
+basic operation performed by STARSPAN is the extraction of
+the spectral data from the raster files whose pixels are
+geometrically contained in the geometry features (points,
+lines, polygons) in the vector data. Extracted pixel data
+are stored in a number of different formats, including ENVI
+\citep{envi} (standard image and spectral library) and CSV
+(comma-separated values), a common text-based format that
+can be imported into standard applications for further
+analysis. Other functionalities include the generation of
+band specific statistics for specified features, extraction
+of features into individual rasters (mini-raster
+generation), update options, and generation of paired pixel
+band values for subsequent calculation of calibration
+coefficients.
+	
+An important goal is that of software extensibility, hence
+STARSPAN is being developed under object-oriented design
+principles so it can be easily extended with new
+functionalities deriving from the core extraction process.
+
+	[[...]]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{A use case}
+
+	[[describe use in delta project...]]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Usage}
+
+In this section we provide a detailed description of the
+main operations performed by STARSPAN.
+
+Figure \ref{fig-usage} contains the usage message given by
+the program.
+
+\begin{figure}[!ht]
+\centering
+\scriptsize{
+\begin{verbatim}
+USAGE:
+  starspan <inputs/commands/options>...
+
+   inputs:
+      -raster <filenames>...
+      -vector <filename>
+      -speclib <filename>
+      -update-csv <filename>
+      -update-dbf <filename>
+
+   commands:
+      -raster_field <name>
+      -raster_directory <directory>
+      -csv <name>
+      -envi <name>
+      -envisl <name>
+      -stats outfile.csv [avg|mode|stdev|min|max]...
+      -calbase <link> <filename> [<stats>...]
+      -report
+      -dbf <name>
+      -dump_geometries <filename>
+      -mr <prefix>
+      -jtstest <filename>
+
+   options:
+      -fields field1 field2 ... fieldn
+      -pixprop <minimum-pixel-proportion>
+      -noColRow
+      -noXY
+      -fid <FID>
+      -skip_invalid_polys
+      -progress [value]
+      -RID_as_given
+      -verbose
+      -ppoly
+      -in
+      -srs <srs>
+\end{verbatim}
+}
+\label{fig-usage}
+\caption{Usage message}
+\end{figure}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Inputs and general options}
+
+Raster data is given through the \verb|-raster| option:
+
+	\verb|-raster| $R_1\ R_2\ \cdots\ R_n$
+
+where $R_1, R_2, \ldots, R_n$ are raster datasets recognized
+by the GDAL library.
+
+Vector data is given with the \verb|-vector| option:
+	
+	\verb|-vector| $V$
+
+where $V$ is a vector datasource recognized by the OGR library.
+
+There are some general options ...
+
+	\verb|-fields| field$_1$ field$_2\ \cdots$ field$_n$
+	
+Only the specified fields will be transferred from vector
+file $V$ to the output. Use spaces to separate the field
+names. Example:
+
+   \verb|starspan -vector V -raster R -csv my.csv  -fields species foo|
+
+will extract the fields with names `species' and `foo.' If
+no field from the vector metadata is desired, just give the
+keyword \verb|-fields| with no arguments. By default, all
+fields from vector will be extracted.
+
+	\verb|-pixprop| value
+
+Minimum proportion of pixel area in intersection so that the
+pixel is included. A value in [0.0, 1.0] must be given. Only
+used in intersections resulting in polygons. By default, the
+pixel proportion is 0.5.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Statistics}
+
+Command \verb|-stats| is used to generate basic band-wise
+statistics for each intersecting feature. Example:
+
+	\verb|starspan -vector V -raster R -stats mystats.csv avg mode|
+
+Creates \verb|mystats.csv|, a CSV (comma-separated-values)
+file containing computed statistics for each FID. In the
+above example, codes \verb|avg| and \verb|mode| indicate to
+compute the average and mode statistics. Available
+statistics are shown in Table \ref{table-stats}.
+
+\begin{table}[!ht]
+\centering
+\caption{Statistics}
+\begin{tabular}{|l|l|}
+\hline 
+ code        & computes for each feature\\
+\hline
+\verb|avg  |  &   average of pixels in feature\\
+\verb|mode |  &   Most frequent value\\
+\verb|stdev|  &   sample standard deviation of pixels in feature\\
+\verb|min  |  &   minimum value of pixels in feature\\
+\verb|max  |  &   maximum value of pixels in feature\\
+\hline
+\end{tabular}
+\label{table-stats}
+\end{table}
+
+The columns in the resulting \verb|myfile.csv| are:
+
+	\begin{itemize}
+	
+		\item Feature ID
+		
+		\item Names of attributes from the given input
+				vector $V$ associated to FID. If option
+				\verb|-fields| is given, only the given fields will
+				be extracted.
+		
+		\item Band names. Each name takes the form
+				$s$\_Band\#, where $s$ is the code of the
+				statistics, eg. \verb|stdev|, and \# is the band
+				number according to given rasters. \end{itemize}
+
+Subsequent lines contain corresponding values for each FID.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Software requirements}
+
+	In order to build STARSPAN the following libraries are
+	required.
+	
+	\begin{itemize}
+	
+		\item GEOS, Geometry Engine \citep{geos}.
+				This library is required to support geometry operations.
+				
+		\item GDAL, Geospatial Data Abstraction Library \citep{gdal}.
+	
+	\end{itemize}
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Conclusion and further work}
+
+	[[...]]
+	
+Currently STARSPAN has been tested and used on Linux based
+operating environments. On the works is to make the tool
+publicly available and easy to install on different
+operating systems.
+
+
+For up-to-date documentation, including installation
+instructions and user manual, please visit:
+\url{http://starspan.casil.ucdavis.edu}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section*{Acknowledments}
+
+This development has been supported by California
+State Department of Boating and Waterways. We acknowledge
+the following people at the CSTARS laboratory for their
+input and tests of the tool: Emma Underwood, Solomon
+Dobrowski, Mike Whiting, Carlos Ramirez, Melinda Mulitsch,
+Larry Ross, George Scheer, Quinn Hart, and Wayland Yu. The
+people behind the GDAL, GEOS and JTS programming
+libraries, on which STARSPAN is constructed, are also
+gratefully acknowledged.
+
+
+
+	
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\bibliographystyle{elsart-harv}
+\bibliography{starspan}
+
+\end{document}
+
+

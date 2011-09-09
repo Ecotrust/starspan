@@ -1,0 +1,15 @@
+ENVI
+samples = 33
+lines   = 106
+bands   = 4
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bsq
+byte order = 0
+map info = {UTM, 1, 1, 742901.826000, 4335075.540000, 1.000000, 1.000000, 10, North}
+band names = {
+Mask (Meta 1 (Mosaic (Band 1):fltall_base_mask):fltall_base_mask_sub),
+Mask (Meta 2 (Mosaic (Band 2):fltall_base_mask):fltall_base_mask_sub),
+Mask (Meta 3 (Mosaic (Band 3):fltall_base_mask):fltall_base_mask_sub),
+Mask (Meta 4 (Mosaic (Band 4):fltall_base_mask):fltall_base_mask_sub)}

@@ -1,0 +1,51 @@
+#!/bin/sh
+#
+# Stript to make StarSpan public source distribution.
+# See configure.in
+# $Id: mksrcdist.sh.in,v 1.4 2008-04-07 20:41:46 crueda Exp $
+#
+if [ -z $1 ]; then
+    echo "USAGE:  mksrcdist.sh { <VERSION> | now }"
+	exit 1
+fi
+VERSION=$1
+
+if [ "$VERSION" = "now" ]; then
+    VERSION=`date +"%Y%m%d_%H%M%S"`
+    tag=r-$VERSION
+    dotag=y
+else
+    if [ "$VERSION" != "@STARSPAN_VERSION@" ]; then
+	    echo "VERSION mismatch.  Check configure.in"
+        exit 2
+    fi
+    tag=`echo release-$VERSION | tr -t . _`
+    echo "Make tag [y/-]?:  cvs -q tag $tag"
+    read dotag
+fi
+
+# $cvsroot: used to export the source from cvs
+# (should be anonymously...
+#cvsroot=":pserver:anonymous@cvs.casil.ucdavis.edu:/cvsroot/starspan"
+# but that's not working, so I'll be using my developer account for now:)
+cvsroot=":ext:crueda@cvs.casil.ucdavis.edu:/cvsroot/starspan"
+
+DISTDIR=/tmp/DISTDIR-starspan/
+
+(test "$dotag" != "y" || cvs -q tag $tag) &&\
+mkdir -p $DISTDIR &&\
+cd $DISTDIR &&\
+echo "Exporting $tag..." &&\
+cvs -d$cvsroot -q export -r $tag -d starspan-$VERSION starspan &&\
+cd starspan-$VERSION &&\
+echo "Reconfiguring..." &&\
+./reconf &&\
+test -f missing && test -f install-sh && test -f depcomp &&\
+cd .. &&\
+echo "Packaging..." &&\
+tar cf starspan-$VERSION.tar starspan-$VERSION &&\
+gzip -9 starspan-$VERSION.tar &&\
+rm -rf starspan-$VERSION &&\
+ls -l &&\
+echo "Done. Check contents of $DISTDIR"
+

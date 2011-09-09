@@ -1,0 +1,41 @@
+StarSpan news
+$Id: NEWS,v 1.4 2008-07-08 07:43:20 crueda Exp $
+
+# (07/07/08)
+Starting development on 1.2.xx series with overhauled command
+line interface.  See ChangeLog.
+
+# (10/30/07)
+Starting development on 1.0.xx series. See ChangeLog.
+
+# (10/19/07)
+StarSpan for Windows 0.2.0 with Large File support
+
+
+
+# (5/19/05)
+An experimental GUI for StarSpan has been released.
+
+# (4/28/05)
+Significant improvements in polygon rasterization which
+makes this operation to run several times faster.
+
+# (4/8/05)
+Installation is now based on ``./configure; make; make
+install'' scheme.
+
+# (3/23/05)
+New --count-by-class command
+
+# (2/19/05)
+Option --buffer updated.
+New option --mini_raster_parity.
+Option --mr renamed to --mini_rasters.
+
+# (2/16/05)
+--mini_raster_strip implemented (0.94beta)
+
+# (2/4/05)
+Added option --nodata.
+Added a preliminary scheme for auto-tests.
+New --buffer option.

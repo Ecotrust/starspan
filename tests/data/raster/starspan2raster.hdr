@@ -1,0 +1,20 @@
+ENVI
+description = {
+  Create New File Result [Wed Aug 04 19:11:28 2004] [Wed Aug 04 19:12:20 2004]}
+samples = 400
+lines = 400
+bands = 4
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bil
+sensor type = Unknown
+byte order = 0
+x start = 7534
+y start = 23910
+map info = {UTM, 1.0, 1.0, 742901.826, 4335165.54, 1.0, 1.0, 10.0, North, North America 1983, units=Meters}
+wavelength units = Unknown
+wavelength = {
+  0.486, 0.57, 0.661, 0.838}
+band names = {
+  Mask, (Meta, 1, (Mosaic}

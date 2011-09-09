@@ -1,0 +1,79 @@
+StarSpan GUI DEVNOTES
+Carlos A. Rueda
+$Id: DEVNOTES.txt,v 1.9 2006-06-20 03:08:08 crueda Exp $
+
+This is an implementation of a GUI for StarSpan based on the GuiE tool.
+GuiE provides a graphical user interface to command-line, non-interactive 
+programs. Basically, this directory contains the GuiE specification 
+starspan.guie required by GuiE, and a mechanism based on Izpack to
+create a tailored installer. There are no dependencies on any of the
+starspan core system. The only dependency will occur at run time when 
+the user executes the command line from within the GUI; at that moment
+the GuiE system will call the executable `starspan.'
+
+Prerequisites
+	The GuiE jars: guie.jar and nanoxml.jar.
+	More info at: http://rtm.casil.ucdavis.edu/
+	
+	IzPack is used to create the installer.
+	http://izforge.com/izpack
+	
+	Apache Ant is used to compile and build the StarSpan GUI.
+	http://ant.apache.org
+	
+	End users will need a Java Runtime Environment to be able to run
+	the StarSpan GUI.
+
+Build
+	You may need to adjust some values in build.properties according
+	to location of prerequisites in your system.
+	
+	To create the installer: 
+		ant installer
+	The executable takes the name install-starspan-gui-${VERSION}.jar
+	
+	To test the installation:
+		ant install
+		
+Running:
+	Run DIR/bin/starspan-gui (unix), or DIR\bin\starspan-gui.bat (windows)
+	where DIR is the installation directory. A shortcut is created under
+	windows.
+	
+Status:
+	Since GuiE is still experimental... you get the idea.
+
+	
+Change log
+----------
+
+06/19/06
+	Miniraster section in starspan.gui was no OK: fixed.
+06/05/06
+	--in and --mini_raster_strip options added to GUI spec starspan.guie
+	Release not created yet.
+	
+
+07/01/05 (version 0.1.3)
+	Bug #200096 fixed: Using GuiE 0.2.5 and setting multi="true" for
+	--fields in starspan.guie.
+	
+06/07/05 (version 0.1.2)
+
+	- starspan.guie rewritten according to new GuiE spec.
+	  A splash screen is now displayed.
+	
+	- New demonstration applet (based on new GuiE functionality).
+	  To prepare and upload applet files:
+	  	ant applet   # copies supporting files to applet/
+		scp -r applet/  crueda@casil.ucdavis.edu:/home/groups/starspan/htdocs/
+	  To test:
+	    mozilla http://starspan.casil.ucdavis.edu/applet/
+	
+05/26/05
+	starspan.guie updates according to changes in core 0.994.
+	
+05/19/05 
+	First implementation. Already functional but needs to be completed
+	perhaps involving changes is the core system itself.
+	

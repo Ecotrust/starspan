@@ -1,0 +1,24 @@
+ENVI
+description = {
+  Create New File Result [Wed Aug 04 19:06:55 2004] [Wed Aug 04 19:12:05 2004]
+  Carlos, this is a comment field in the metadata -- can you extract me?}
+samples = 400
+lines   = 400
+bands   = 4
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bil
+sensor type = Unknown
+byte order = 0
+x start = 7442
+y start = 23510
+map info = {UTM, 1.000, 1.000, 742809.826, 4335565.540, 1.0000000000e+000, 1.0000000000e+000, 10, North, North America 1983, units=Meters}
+wavelength units = Unknown
+band names = {
+ Mask (Meta 1 (Mosaic (Band 1):fltall_base_mask):fltall_base_mask_sub), 
+ Mask (Meta 2 (Mosaic (Band 2):fltall_base_mask):fltall_base_mask_sub), 
+ Mask (Meta 3 (Mosaic (Band 3):fltall_base_mask):fltall_base_mask_sub), 
+ Mask (Meta 4 (Mosaic (Band 4):fltall_base_mask):fltall_base_mask_sub)}
+wavelength = {
+ 0.486000, 0.570000, 0.661000, 0.838000}

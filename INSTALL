@@ -1,0 +1,65 @@
+StarSpan Installation instructions
+$Id: INSTALL,v 1.6 2005-08-18 09:48:00 crueda Exp $
+
+Software prerequisites
+----------------------
+The following libraries must be properly installed on your system
+before StarSpan can be compiled and installed:
+    * GEOS 2.1.2 or newer
+    * GDAL 1.2.6 or newer
+
+For more details about these prerequisites, visit the StarSpan website
+at http://starspan.casil.ucdavis.edu/
+
+StarSpan installation
+---------------------
+A typical installation of StarSpan can be done as follows.
+
+    * Go to http://casil.ucdavis.edu/project/showfiles.php?group_id=48
+      and download starspan-XXXX.tar.gz where XXXX is the most
+      recent release number.
+    * tar zxf starspan-XXXX.tar.gz
+    * cd starspan-XXXX
+    * ./configure
+    * make
+    * make install
+
+By default, `make install' will install StarSpan's files in
+`/usr/local/bin', `/usr/local/lib', etc. You can specify an
+installation prefix other than `/usr/local' by giving `configure' the
+option `--prefix=PATH'. Depending on the install destination you may
+need to have root privileges to run the `make install' step. Type
+`./configure --help' for more details.
+
+To run StarSpan, just type `starspan [ARGUMENTS]' at the command prompt.
+
+
+Extended usage dependencies
+---------------------------
+Note: If you don't plan to run the extended functionalities, just
+ignore the rest of this section.
+
+Certain testing options require a JRE (Java Runtime Environment) and a
+number of Java archives as explained below.
+
+The required Java archives must be copied manually in
+$(STARSPAN_PREFIX)/bin/starspan.jars/
+
+The extended usage options are:
+
+--view_geometries option:
+This option requires:
+     plotapplication.jar
+Which can be downloaded from http://ptolemy.eecs.berkeley.edu/java/ptplot
+This option has been tested with version 5.1p2.
+
+--test
+--jts options:
+These options require:
+     xerces.jar
+     jts-1.4.0.jar
+     jdom.jar
+     JTS_Test.jar
+     Acme.jar
+Which can be downloaded from http://www.vividsolutions.com/jts/jtshome.htm
+This option has been tested with JTS 1.4

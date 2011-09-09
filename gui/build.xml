@@ -1,0 +1,54 @@
+<!--
+	Build for StarSpan GUI
+	Carlos A. Rueda
+	$Id: build.xml,v 1.4 2005-06-08 10:38:04 crueda Exp $
+-->
+<project name="StarSpan" default="installer" >
+	<!-- load basic properties -->
+	<property file="build.properties"/>
+
+	<!-- Directory to put distribution -->
+	<property name="dist" value="${generated}/DIST"/>
+
+	<target name="init">
+		<tstamp/>
+		<echo message="VERSION = ${VERSION}"/>
+	</target>
+
+	<target name="applet" depends="init">
+		<copy file="${guie}" todir="applet"/>
+		<copy file="${dist}/base_dist/bin/starspan.guie" todir="applet"/>
+	</target>
+	
+	<target name="prepare-inst" depends="init">
+		<delete dir="${dist}/base_dist"/>
+		<copy todir="${dist}/base_dist">
+			<fileset dir="base_dist"/> 
+		</copy>
+		<copy file="${guie}" todir="${dist}/base_dist/bin"/>
+		<copy file="copyright.txt" todir="${dist}/base_dist/doc"/>
+		<copy file="izshortcut.xml" todir="${dist}/base_dist/lib"/>
+	</target>
+
+	<target name="installer"  depends="prepare-inst"
+	 description="Makes an executable installer for StarSpan GUI">
+		<taskdef name="izpack" classpath="${izdir}/lib/compiler.jar"
+			classname="com.izforge.izpack.ant.IzPackTask"/>
+		<izpack input="izinstall.xml"
+			output="${dist}/install-starspan-gui-${VERSION}.jar"
+			installerType="standard-kunststoff"
+			basedir="${dist}/base_dist"
+			izPackDir="${izdir}/"/>
+	</target>
+
+	<target name="install" description="Launches the installer">
+		<java jar="${dist}/install-starspan-gui-${VERSION}.jar" fork="true"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${generated}"/>
+		<delete file="applet/guie.jar"/>
+		<delete file="applet/starspan.guie"/>
+	</target>
+
+</project>

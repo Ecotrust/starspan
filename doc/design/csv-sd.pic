@@ -1,0 +1,48 @@
+.PS
+
+copy "sequence.pic";
+
+boxwid = 1.3;
+
+# Define the objects
+actor(A,"");
+placeholder_object(S)
+placeholder_object(O)
+placeholder_object(T)
+step();
+
+# Message sequences
+create_message(A,S,"s:Starspan");
+active(S);
+
+create_message(S,T,"t:Traverser");
+active(T);
+message(S,T,"setVector(vector)");
+message(S,T,"addRaster(raster)");
+
+create_message(S,O,"o:CSVObserver");
+
+message(S,T,"addObserver(o)");
+
+message(S,T,"traverse()");
+step();
+active(O);
+
+message(T,O,"init(globalInfo)");
+message(T,O,"intersectionFound(feature)");
+message(T,O,"addPixel(event)");
+message(T,O,"end()");
+
+return_message(T,S,"return");
+inactive(T);
+destroy_message(S,T);
+
+destroy_message(S,O);
+inactive(O);
+inactive(S);
+
+complete(O);
+complete(S);
+complete(A);
+
+.PE

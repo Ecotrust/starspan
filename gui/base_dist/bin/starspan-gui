@@ -1,0 +1,5 @@
+# shell file to invoke the StarSpan GUI
+# $Id: starspan-gui,v 1.1 2005-05-19 21:37:45 crueda Exp $
+STARSPANGUIDIR="$INSTALL_PATH"
+java -jar "$STARSPANGUIDIR/bin/guie.jar" "$STARSPANGUIDIR/bin/starspan.guie"
+

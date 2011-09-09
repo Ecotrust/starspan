@@ -1,0 +1,123 @@
+###########################################################
+# starspan configure.in
+# $Id: configure.in,v 1.32 2008-07-26 21:35:46 crueda Exp $
+###########################################################
+
+AC_INIT(src/starspan2.cc)
+AC_PREREQ(2.52)
+AC_PROG_CC
+AC_PROG_CXX
+AC_PATH_PROGS(SH, sh)
+AC_PROG_INSTALL
+STARSPAN_VERSION=1.2.05
+AM_INIT_AUTOMAKE(starspan,$STARSPAN_VERSION)
+AC_SUBST(STARSPAN_VERSION)
+AC_CONFIG_HEADERS(src/config.h)
+AC_SUBST(SH)
+
+dnl ###########################################################
+dnl GEOS
+dnl ###########################################################
+AC_ARG_WITH(geos,[  --with-geos=ARG         Path to geos-config],,)
+if test "$with_geos" = "yes" -o "$with_geos" = "" ; then
+  AC_PATH_PROG(GEOS_CONFIG, geos-config, no)
+else
+  if test "`basename xx/$with_geos`" = "geos-config" ; then
+    AC_MSG_RESULT([GEOS enabled with provided geos-config])
+    GEOS_CONFIG="$with_geos"
+  else
+    AC_MSG_ERROR([--with-geos should have yes or a path to geos-config])
+  fi
+fi
+if test "$GEOS_CONFIG" != "no" ; then
+  VERSION=`$GEOS_CONFIG --version`
+  AC_MSG_RESULT([$GEOS_CONFIG reports version $VERSION])
+  LIBS="`$GEOS_CONFIG --libs` $LIBS"
+  GEOS_INC=`$GEOS_CONFIG --cflags`
+  GEOS_PREFIX=`$GEOS_CONFIG --prefix`
+fi
+
+case $program_prefix in
+NONE) program_prefix="" ;;
+esac
+
+case $program_suffix in
+NONE) program_suffix="" ;;
+esac
+
+AC_SUBST(GEOS_INC GEOS_PREFIX program_prefix program_suffix)
+
+dnl ###########################################################
+dnl End GEOS
+dnl ###########################################################
+
+
+dnl ###########################################################
+dnl GDAL
+dnl ###########################################################
+AC_ARG_WITH(gdal,[  --with-gdal=ARG         Path to gdal-config],,)
+if test "$with_gdal" = "yes" -o "$with_gdal" = "" ; then
+  AC_PATH_PROG(GDAL_CONFIG, gdal-config, no)
+else
+  if test "`basename xx/$with_gdal`" = "gdal-config" ; then
+    AC_MSG_RESULT([GDAL enabled with provided gdal-config])
+    GDAL_CONFIG="$with_gdal"
+  else
+    AC_MSG_ERROR([--with-gdal should have yes or a path to gdal-config])
+  fi
+fi
+if test "$GDAL_CONFIG" != "no" ; then
+  VERSION=`$GDAL_CONFIG --version`
+  AC_MSG_RESULT([$GDAL_CONFIG reports version $VERSION])
+  LIBS="`$GDAL_CONFIG --libs` $LIBS"
+  GDAL_INC=`$GDAL_CONFIG --cflags`
+  GDAL_PREFIX=`$GDAL_CONFIG --prefix`
+  OGR=`$GDAL_CONFIG --ogr-enabled`
+  if test "$OGR" != "yes" ; then
+  	AC_MSG_ERROR([$GDAL_CONFIG says OGR is not enabled])
+  fi
+fi
+AC_SUBST(GDAL_INC GDAL_PREFIX)
+
+dnl ###########################################################
+dnl End GDAL
+dnl ###########################################################
+
+
+dnl ###########################################################
+dnl GRASS
+dnl ###########################################################
+GRASS_LIB=
+GRASS_LDADD=
+AC_ARG_WITH(grass,[  --with-grass=ARG        Include GRASS support (GRASS 5.7+, ARG=GRASS install tree dir)],,)
+if test "$with_grass" != "" ; then
+  GRASS_PREFIX=$with_grass
+  GRASS_LIB_DIR="$GRASS_PREFIX/lib"
+  LIBS="-L$GRASS_LIB_DIR -lgrass_gis -lgrass_datetime $LIBS -lz -lm"
+  GRASS_LIB="-L$GRASS_LIB_DIR"
+  GRASS_LDADD="-lgrass_gis -lgrass_datetime $LIBS -lz -lm"
+
+  GRASS_INCLUDE_DIR="$GRASS_PREFIX/include"
+  CPPFLAGS="$CPPFLAGS -I$GRASS_INCLUDE_DIR"
+
+  # check header:
+  AC_CHECK_HEADERS(grass/gis.h, [], [AC_MSG_ERROR([grass/gis.h header not found.
+    If you do have grass installed, please use the option
+	--with-grass=dir or to specify the right prefix
+	GRASS directory.])])
+  
+  # check corresponding library:
+  AC_CHECK_LIB(grass_gis,G_define_module, [], [AC_MSG_ERROR([grass library not found.
+    If you do have grass installed, please use the option
+    --with-grass=dir to specify the right prefix
+    GRASS directory.])])
+fi
+AC_SUBST(GRASS_LIB,$GRASS_LIB)
+AC_SUBST(GRASS_LDADD,$GRASS_LDADD)
+
+dnl ###########################################################
+dnl End GRASS
+dnl ###########################################################
+
+
+AC_OUTPUT([Makefile starspan mksrcdist.sh])

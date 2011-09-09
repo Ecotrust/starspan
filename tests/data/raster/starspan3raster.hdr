@@ -1,0 +1,23 @@
+ENVI
+description = {
+  Create New File Result [Wed Aug 04 19:10:13 2004] [Wed Aug 04 19:12:32 2004]}
+samples = 400
+lines   = 400
+bands   = 4
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bil
+sensor type = Unknown
+byte order = 0
+x start = 7626
+y start = 24091
+map info = {UTM, 1.000, 1.000, 742993.826, 4334984.540, 1.0000000000e+000, 1.0000000000e+000, 10, North, North America 1983, units=Meters}
+wavelength units = Unknown
+band names = {
+ Mask (Meta 1 (Mosaic (Band 1):fltall_base_mask):fltall_base_mask_sub), 
+ Mask (Meta 2 (Mosaic (Band 2):fltall_base_mask):fltall_base_mask_sub), 
+ Mask (Meta 3 (Mosaic (Band 3):fltall_base_mask):fltall_base_mask_sub), 
+ Mask (Meta 4 (Mosaic (Band 4):fltall_base_mask):fltall_base_mask_sub)}
+wavelength = {
+ 0.486000, 0.570000, 0.661000, 0.838000}

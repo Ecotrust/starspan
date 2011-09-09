@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+
+<!--
+	Installer shortcut specification 
+	Carlos A. Rueda
+	$Id: izshortcut.xml,v 1.1 2005-06-15 01:46:56 crueda Exp $
+-->
+<shortcuts>
+  <programGroup defaultName="StarSpan" location="applications"/>
+  <shortcut
+     name="StarSpan GUI"
+     programGroup="yes"
+     desktop="no"
+     applications="no"
+     startMenu="no"
+     startup="no"
+     target="$INSTALL_PATH\bin\starspan-gui.bat"
+     commandLine=""
+     description="Launch the StarSpan GUI"
+     initialState="noShow">
+     <createForPack name="System"/>
+   </shortcut>
+
+   <shortcut
+     name="Uninstall StarSpan GUI"
+     programGroup="yes"
+     desktop="no"
+     applications="no"
+     startMenu="no"
+     startup="no"
+     target="$INSTALL_PATH\Uninstaller\uninstaller.jar"
+     commandLine=""
+     description="StarSpan uninstaller">
+     <createForPack name="System" />
+   </shortcut>
+   
+</shortcuts>

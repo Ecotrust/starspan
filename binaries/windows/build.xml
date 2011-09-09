@@ -1,0 +1,97 @@
+<!--
+	Build for StarSpan for Windows
+	Carlos A. Rueda
+	$Id: build.xml,v 1.11 2008-07-18 22:02:34 crueda Exp $
+-->
+<project name="StarSpan" default="installer" >
+	<!-- load basic properties -->
+	<property file="build.properties"/>
+
+	<property name="ZIPNAME" value="starspan-${STARSPAN_VERSION}-win32.zip"/>
+
+	<!-- Directory to put distribution -->
+	<property name="dist" value="${generated}/DIST"/>
+    
+	<target name="init">
+		<tstamp/>
+		<echo message="VERSION = ${VERSION}"/>
+	</target>
+
+    <!-- Only command-line files -->
+	<target name="cl">
+        <tstamp/>
+		<delete dir="${dist}/base_dist"/>
+		<copy file="copyright.txt" todir="${dist}/base_dist/doc"/>
+		<copy file="base_dist/bin/libgeos_c-1.dll" todir="${dist}/base_dist/bin"/>
+		<copy file="base_dist/bin/libgeos-2.dll" todir="${dist}/base_dist/bin"/>
+		<copy file="base_dist/bin/libgdal-1.dll" todir="${dist}/base_dist/bin"/>
+		<copy file="base_dist/bin/ogrinfo.exe" todir="${dist}/base_dist/bin"/>
+		<copy file="base_dist/bin/gdalinfo.exe" todir="${dist}/base_dist/bin"/>
+		<copy file="base_dist/bin/starspan2.exe" todir="${dist}/base_dist/bin"/>
+		
+        <echo file="${dist}/base_dist/bin/starspan.bat"
+>REM Starspan ${STARSPAN_VERSION}
+REM See ..\README.txt
+%~dp0starspan2.exe %*
+        </echo>
+        
+        <echo file="${dist}/base_dist/README.txt"
+>Starspan ${STARSPAN_VERSION}
+
+Running the command line executable
+
+- Open a command window
+- Assuming you unpacked the contents of ${ZIPNAME} in C:\My\Dir\,
+  you can run StarSpan as follows:
+    C:\My\Dir\starspan  ...arguments...
+    
+You can also optionally set your PATH environment variable, eg.,
+    PATH=C:\My\Dir\;%PATH%
+(see your Windows documentation) so, you can just call:
+    starspan  ...arguments...
+    
+If the batch program (starspan.bat) does not run properly, 
+try running starspan2.exe directly.
+
+Copyright agreement:
+  Please, see doc\copyright.txt
+        </echo>
+        <fixcrlf eol="dos" file="${dist}/base_dist/bin/starspan.bat"/>
+        <fixcrlf eol="dos" file="${dist}/base_dist/README.txt"/>
+        
+        <zip destfile="${dist}/${ZIPNAME}"
+             basedir="${dist}/base_dist"
+        />
+	</target>
+
+	<target name="prepare-inst" depends="init">
+		<delete dir="${dist}/base_dist"/>
+		<copy file="../../starspan.jars/guie.jar" todir="${dist}/base_dist/bin"/>
+		<copy file="../../gui/base_dist/bin/starspan.guie" todir="${dist}/base_dist/bin"/>
+		<copy todir="${dist}/base_dist">
+			<fileset dir="base_dist"/> 
+		</copy>
+		<copy file="copyright.txt" todir="${dist}/base_dist/doc"/>
+		<copy file="izshortcut.xml" todir="${dist}/base_dist/lib"/>
+	</target>
+
+	<target name="installer"  depends="prepare-inst"
+	 description="Makes an executable installer for StarSpan for Windows">
+		<taskdef name="izpack" classpath="${izdir}/lib/compiler.jar"
+			classname="com.izforge.izpack.ant.IzPackTask"/>
+		<izpack input="izinstall.xml"
+			output="${dist}/install-starspan-win32-${VERSION}.jar" 
+			installerType="standard"
+			basedir="${dist}/base_dist"
+			izPackDir="${izdir}/"/>
+	</target>
+
+	<target name="install" description="Launches the installer">
+		<java jar="${dist}/install-starspan-win32-${VERSION}.jar" fork="true"/>
+	</target>
+
+	<target name="clean">
+		<delete dir="${generated}"/>
+	</target>
+
+</project>

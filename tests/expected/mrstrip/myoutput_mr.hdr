@@ -1,0 +1,39 @@
+ENVI
+samples = 157
+lines   = 339
+bands   = 4
+header offset = 0
+file type = ENVI Standard
+data type = 2
+interleave = bsq
+byte order = 0
+map info = {Unknown, 1, 1, 0.000000, 0.000000, 1.000000, -1.000000, 0, North}
+band names = {
+Band 1,
+Band 2,
+Band 3,
+Band 4}
+map info = {Unknown, 1, 1, 0.000000, 0.000000, 1.000000, -1.000000, 0, North}
+band names = {
+Band 1,
+Band 2,
+Band 3,
+Band 4}
+map info = {Unknown, 1, 1, 0.000000, 0.000000, 1.000000, -1.000000, 0, North}
+band names = {
+Band 1,
+Band 2,
+Band 3,
+Band 4}
+map info = {Unknown, 1, 1, 0.000000, 0.000000, 1.000000, -1.000000, 0, North}
+band names = {
+Band 1,
+Band 2,
+Band 3,
+Band 4}
+map info = {Unknown, 1, 1, 0.000000, 0.000000, 1.000000, -1.000000, 0, North}
+band names = {
+Band 1,
+Band 2,
+Band 3,
+Band 4}

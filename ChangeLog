@@ -1,0 +1,1284 @@
+StarSpan ChangeLog
+$Id: ChangeLog,v 1.86 2008-07-26 21:57:19 crueda Exp $
+
+2011-09-06 (1.2.06) mperry
+    - set table_suffix default to NULL;
+	- make full table output in --outtype=table mode optional
+
+2011-08-17 (1.2.05) mperry
+    - We (Ecotrust) have forked starspan and are providing this patched version since the original, developed at UC Davis, is no longer maintained. 
+	- Specifically, this version can be compiled with a newer version of GCC (e.g. GCC 4.4 which ships with Ubuntu 10.4) by explicitly including standard libs.
+	- This version of starspan is also updated to play nice with GEOS 3.3 which requires dynamic_casts (rather than the C-style casts used in the original code).
+
+2008-07-24 (1.2.03) 
+    - Fix of bug [200376] Projections do not match under GDAL 1.4:
+      Flag --validate_inputs added.
+      By default, starspan will not prevalidate the various input elements for
+      consistent projection info. This flag enables this check.
+      (Environment variable STARSPAN_NO_VALIDATE_INPUTS no longer used).
+      
+      MinGW build successful using 1.5.2.
+      See http://starspan.casil.ucdavis.edu/doku/doku.php?id=mingw
+                            
+      
+    - New binaries/windows/mingw_prepare_binaries.sh to facilitate preparation
+      of windows release.
+    
+2008-07-19
+    - some fixes with new naming mechanism with suffixes.
+    - Using new version of GuiE that fully shows the output of
+    `sys-commands` in text components.
+    
+2008-07-18 
+    - Various adjustments to create Windows releases.
+    
+
+2008-07-08 (1.2.01) alpha release.
+
+2008-07-07 (starting versions 1.2.xx)
+
+    NOTE: Several changes in command line interface.
+
+    - Removed old stuff that hasn't been tested for a long time.
+      The following options have been removed:
+            --raster_directory <directory>
+            --update-csv <filename>
+            --envi <name>
+            --envisl <name>
+            --speclib <filename>
+            --calbase <link> <filename> [<stats>...]
+            
+       Renamed options:
+            --duplicate_pixel      ->  --duplicate
+            --report_elapsed_time  ->  --elapsed_time
+            
+       Added options according to new command line interface, some of which
+       replace corresponding pre-existing options in the old style:
+       
+		    --out-prefix <string>                --out-type <type>
+		    --table-suffix <string>
+		    --summary-suffix <string>            --stats <stat> <stat>
+            --class-summary-suffix <string>
+		    --mr-img-suffix <string>             --mini_raster_parity <parity>
+		    --mrst-img-suffix <string>           --mrst-shp-suffix <string>
+		    --mrst-fid-suffix <string>           --mrst-glt-suffix <string>
+       
+       Also the GuiE spec gui/base_dist/bin/starspan.guie has been updated
+       accordingly.  (BTW, now using GuiE 0.2.8)
+            
+
+            
+    
+2008-05-15
+    - Implemented ignore_nodata mode to select from multiple rasters
+        --duplicate_pixel ignore_nodata {all_bands | any_band | band <#>}
+        
+        Any pixel in the feature being processed that satisfies the condition
+        according to the mode will be ignored. The conditions are:
+        
+        all_bands: all bands with the nodata value
+        any_band:  any band with the nodata value
+        band <#>:  especific band number # with the nodata value
+
+    - BoxParams: width and height now allow a qualifier; for now, only the "px"
+      suffix to indicate units in pixels instead of dataset's units.
+      
+      
+2008-05-08
+    - common.h: added def:
+        #define RID_colName "RID"
+      TODO: Other similar hard-coded values, but in general with a parameterized
+      mechanism.
+        
+    - mini_raster_strip with shapefile creation: --RID option handled; it creates
+      "RID" (ie, RID_colName) column if RID option != "none" and puts the value
+      accordingly.
+    
+    - Simplifying parameter handling for traverser: instead of replicating them
+      in traverser's own structures/variables, just use the globalOptions structure:
+        - boxParams: done
+        - bufferParams: done
+        - vSelParams: done
+        - verbose: done
+        - pixelProportion: done
+        - skip_invalid_polys: done
+        
+2008-05-07 (1.0.08)
+    - starspan_create_strip(): Explicitly assigning the geoTransform to the 
+      generated strips. It uses the geoTransform from the first miniraster but
+      sets the origin point to be (0,0). 
+      In particular, for the --mini_raster_strip command with shapefile creation,
+      this adjustment makes the generated datasets to match properly.
+    
+    - Since starspan now checks that the projection of the input datasets be
+      the same, I converted the polygon shapefile for the current tests to
+      match the projection of the raster files:
+        cd tests/data/vector
+        ogr2ogr -t_srs "+proj=utm +zone=10 +ellps=WGS84 +datum=WGS84 +units=m +no_defs" \
+        ply/ply.shp starspan_testply.shp
+      Also converted the other shapefiles for future use.
+      (cd tests && make) # -> OK
+                 
+2008-05-01,02
+    - Refactoring miniraster strip creation to allow duplicate pixel handling:
+      - MiniRasterObserver: no Traverser as a member any more.
+      - IntersectionInfo: now includes the traverser.
+      - MiniRasterStripObserver: setOutVector() and setOutVectorDirectly()
+        to allow association of output vector either with no ownership or with
+        ownership.
+      - MiniRasterStripObserver.create_strip() removed. Instead, this functionality
+        was moved to new utility starspan_create_strip().
+      - New starspan_getMiniRasterStripObserver2() and starspan_minirasterstrip2()
+        to handle the generation of the strip with duplicate_pixel modes.
+      - TODO: complete preliminary tests.
+    
+    
+2008-04-24
+    - GRASS interface documentation updated in web site: 
+        http://starspan.casil.ucdavis.edu/doku/doku.php?id=grass
+
+    - Rasterization process documented in: 
+        http://starspan.casil.ucdavis.edu/doku/doku.php?id=rasterization
+      --rasterize option still internal for testing purposes.
+      Also added rasterize command to GRASS interface to facilitate this
+      testing, although the GDAL GRASS driver cannot create new GRASS rasters;
+      using ENVI for output rasters for now.
+
+2008-04-22
+    - Implemented grass interface commands:
+        report
+        csv
+        
+    - Each command is GRASS-configured individually so it is better dispatched
+      in terms of pertinent options. Also, the command can be dispached from
+      the GRASS GUI, including selection according to input map: vector or raster.
+        
+        
+      NOTE: starspan_dup_pixel() was segfaulting with versions geos 2.2.3 and
+      gdal 1.5.0. Just updated geos to 3.0.0 (on pegasus) and problem fixed. 
+            
+       
+        
+2008-04-21
+    - New starspan_grass.cc: preliminaries for providing a GRASS interface.
+    
+2008-04-18
+    - New starspan_rasterize.cc: goal: do some basic comparisons with the
+      output generated by GRASS' v.to.rast.
+
+2008-04-17
+    - Code cleanup:
+        - Removed (not used):
+            - starspan_csv_dup_pixel.cc
+            - starspan_db.cc
+            - starspan_tuct1.cc
+            - starspan_update_dbf.cc
+            - function starspan_myErrorHandler()
+        - Improved comments to some sources
+        
+        - Moved src/rasterizers/agg_*.h to new dir src/rasterizers/agg/
+          (agg is used only for line rasterization but other types of
+          rasterization may eventually be located in src/rasterizers/.)
+    
+2008-04-11
+    - new IntersectionInfo struct to add more information in intersectionFound() 
+      and intersectionEnd() traversal observer interface.
+      
+    - Shapefile creation for mini_raster_strip now working including for --box
+      option. Tested as follows (under tests/):
+      * Mini raster strip with accompanying shapefile and using the –in option:
+         ../starspan2  \
+             --vector data/vector/starspan_testply.shp \
+             --raster data/raster/starspan2raster.img  \
+             --mini_raster_strip generated/mrstrip/myoutput_ \
+                                 generated/mrstrip/myoutput.shp \
+             --in \
+             --separation 10
+
+      * Mini raster strip example with accompanying shapefile and using the –box option:
+         ../starspan2  \
+             --vector data/vector/starspan_testply.shp \
+             --raster data/raster/starspan2raster.img  \
+             --mini_raster_strip generated/mrstrip_box/box_100_ \
+                                 generated/mrstrip_box/box_100_.shp \
+             --box 100 \
+             --separation 10
+             
+      See: http://starspan.casil.ucdavis.edu/doku/doku.php?id=minirasterstrip
+      
+      
+2008-04-10
+    - Some code cleanup:
+        Removed vector/{Makefile,Vector_shapelib.cc}
+        
+    - Adding shapefile creation for mini_raster_strip
+        
+2008-04-05 (1.0.08)
+    - tests/Makefile: use zcat for comparison instead of gunzip
+      (so the .gz, which is on CVS, is preserved).
+      
+    - Removed FR 200347: --mini_raster_box option
+    
+    - Added FR 200348: extract a centered box wrt feature's bounding box.
+    
+      This is implemented with the --box option, which behaves as a variant
+      of the --buffer operation, so it's handled by traverser. 
+      Only one of --buffer or --box may be specified.
+      
+      
+    - Removed starspan_minirasterstrip.cc (function starspan_miniraster_strip())
+      Was never implemented.
+      
+    
+2008-03-27 (1.0.08)
+    - Fresh release to facilitate creation of windows binaries.
+    
+2008-03-03 (1.0.07)
+    - Adding options --sql, --where, and --dialect à la ogrinfo.
+      Preliminary tests OK.
+        
+      More details about the syntax for --sql:  http://gdal.org/ogr/ogr_sql.html
+      The "where" section corresponds to the --where option.
+
+      In starspan you will write something like for example:
+        starspan --vector myvector.shp \
+                 --where "(SITE_ID >= 10) and (SITE_ID <= 20)"  ...other options...
+
+      Although more tests are pending, I think these new options should work as 
+      expected.
+
+      
+    - removed unneeded starspan_csv_dup_pixel.cc from Makefile.am
+    
+    - configure.in, starspan.in: using program_prefix and program_suffix to
+      refer to binary executable, so the corresponding ./configure options
+      are honored.
+      
+    - Adjustments to GEOS include files according to deprecated warning
+      issued by GEOS 3.0.0
+      
+      
+    - Since GDAL and GRASS are working nicely together on pegasus, I just made a
+      basic test to confirm that starspan can access vector and raster GRASS
+      datasets, and everything seems to work fine. For example, according the 
+      the naming of the datasources explained in http://gdal.org/ogr/drv_grass.html
+      and http://gdal.org/frmt_grass.html:
+
+        starspan --raster /proj/delta/gis/grass/delta/lidar_shadows/cellhd/200506_p1_31_beam_irradiance --report
+        starspan --vector /proj/delta/gis/grass/delta/carueda/vector/starspan_testply/head --report
+
+      Note that you don't have to launch these commands from within GRASS to access
+      the datasets. However, more information is reported for rasters
+      when the command is launched from within GRASS.
+
+      Note also that accepting the inputs according to the GRASS syntax, for example:
+        starspan-grass raster=00506_p1_31_beam_irradiance@lidar_shadows vector=somevector@somewhere ...etc...
+      is another story; this would required a concrete module in starspan especially 
+      designed to use the GRASS APIs.      
+    
+      
+2008-02-05
+    - Included --gui extended option to launch the GUI
+    
+2008-02-02
+        - starspan_csv_dup_pixel.cc: Minor changes in log messages for
+          easier inspection.
+
+2008-01-28
+	- Added processing of rasters according to associated masks.
+      See starspan_csv_dup_pixel.cc
+	  
+      Tests done with:
+        VECTOR=/proj/delta/gis/vector_data/phenology/200406/all_emergent_polyg_2004.shp
+        RASTERS=/proj/delta/raster/hymap/classification/version_4/200406/inputs/indexes/sdw_p1_*_indx
+        MASKS=/proj/delta/raster/hymap/base/ref1_geo3/200406/mask_edge/200406_p1_*_ref1_mask.img
+        
+        cd /proj/delta/raster/hymap/classification/version_4/200406/results
+        starspan --duplicate_pixel direction 90 --vector $VECTOR \
+            --raster $RASTERS --mask $MASKS \
+            --csv test_dupixel.csv --verbose > test_dupixel.log
+
+    - TODO: mask handling on other options/commands -- now, only done for the
+            --duplicate_pixel and --csv commands
+
+2008-01-24 (1.0.06)
+	- First tests on --duplicate_pixel
+	- Dev note: layer->ResetReading() call in traverse()
+	  New static flag: bool _resetReading in class Traverser:
+	    By default, traverse() starts by calling ResetReading on the layer
+	    (_resetReading == true).
+	    However, this is in general not appropriate because it precludes the
+	    traversal from being used as a subtask. 
+	    For example, in starspan_csv_dup_pixel, all features are processed
+	    but the extraction from each one is done with a corresponding traversal.
+	    As a quick fix to allow for this behavior at least for specific commands,
+	    this global (static) flag can be used to instruct the traversal not
+	    to call ResetReading on the layer.
+
+     - Fixed some memory errors and leaks -- thanks valgrind, again!
+		
+
+2008-01-16 (1.0.06)
+	- FR #350112: Duplicate pixel handling -- starting implementation.
+	See discussion: http://starspan.casil.ucdavis.edu/doku/doku.php?id=fr_350112
+	
+	
+	
+	
+	
+2007-12-14 (1.0.05)
+	- FR #200332: Added --delimiter option, now used in:
+	    function                           command
+	    -------------------                ------------
+	    starspan_csv                       --csv
+	    starspan_stats                     --stats
+	    starspan_update_csv                --update-csv
+	    starspan_getCountByClassObserver   --count-by-class
+	    
+	  In --update-csv, the given delimiter is used for reading in the given 
+	  input CSV file and to generate the new CSV file. 
+	
+2007-12-10 (1.0.04)
+	- Changes to compile StarSpan against GEOS 3.x.x
+	  See GEOS_VERSION_MAJOR-conditioned code in:
+	  	traverser.h, traverser.cc
+	  Other various changes consisted in dropping the geos::* namespace,
+	  which is now handled in traverser.h
+	  
+	  NOTE: Successfully tested against 3.0.0rc3 on various machines but
+	  was unsuccessful against 3.0.0rc4 (latest at this date): an error
+	  at link time relate with not finding destructor ~Coordinate or
+	  something liket that.
+	  
+2007-12-03 (1.0.03) Performance inprovement with spatial filter.
+	- traverser.cc: Spatial filtering is now used by default. In case no 
+	spatial	filtering is desired, define the environment variable 
+	STARSPAN_NO_SPATIAL_FILTER.
+		
+	Performance comparison with the --stats command on the following inputs:
+	  vector: /proj/delta/gis/field_work/field_data/200706/data3/all_teams_nudged.shp 
+	  64 rasters: /proj/delta/raster/hymap/base/ref1_geo3/200706/*_ort
+	  
+	   Rasters with intersecting pixels: 47
+	Rasters with No intersecting pixels: 17
+	
+	'time' reported:            real        user     system      
+	   With spatial filter:    133.63      76.34    16:35.81 
+	     No spatial filter:  20m10.507s  5m55.868s  1m23.537s
+	In this case the improvement gives a ~10 times speedup!
+	
+2007-12-01
+	- Testing the use of spatial filter to get features:
+		STARSPAN_USE_SPATIAL_FILTER=1 starspan ...
+	  under tests/, for example:
+	  	make STARSPAN=starspan STARSPAN_USE_SPATIAL_FILTER=1 test_csv
+	
+2007-11-30 (1.0.02)
+	- --stats now accepts multiple rasters; each one processed at a time
+	- NOTE about the call observer->intersectionFound(OGRFeature* feature)
+	  in Traverser::process_feature:
+		Particularly in the case of a GeometryCollection, it might be the
+		case that this feature is found to be an intersecting one even though
+		that no pixel will be found to be intersecting. Observers may in general
+		want to confirm the actual intersection by looking at the number of pixels
+		that are reported to be intersected.
+	
+2007-11-19
+   	- Option --fields now also accepts "none"
+	- Fixed argument check for --RID
+	
+	
+2007-11-16: Carlos Rueda
+	** Starting version 1.0.xx **
+
+	- configure.in to version 1.0.01	
+	- --report too restrictive about inputs: fixed. 
+	
+2006-3-25: perrygeo
+      - configure.in to version 0.998
+      - src/tranverser/polyqt.cc : relative epsilon instead of constant
+
+2006-03-24:  perrygeo
+      - Exposed the SUM statistic
+      - Removed NoData/Null Values from the stats calculations
+      - Calculate two new stats: MEDIAN and NULLS (ie number of nodata
+	values)
+        
+2005-11-17
+	tests/misc/LFS/: new code to test LFS
+
+2005-08-18 (0.997)
+	- 0.997 created to synchronize the whole thing. 
+	
+2005-08-17 (0.996)
+	- mksrcdist.sh: set DISTDIR to /tmp/DISTDIR-starspan/
+	  The problem was that ./reconf on the exported contents was not
+	  creating the files depcomp, missing, and install-sh, required
+	  for a successfull ./configure; make; ... on the user machine.
+	  It seems the reason is that automake finds those files in ../ or
+	  ../../ and then doesn't create new copies. I looked for an
+	  option to force automake to create those files but didn't find
+	  any; so a simple solution is to create the distribution in a
+	  different directory not descending from this one.
+	
+2005-07-04 (0.996)
+	Refactoring on management of set of visited pixels (pixset) with
+	the goal of optimizing memory usage in the case of big features:
+
+	Traverser.h declares new classes PixSet and PixSet::Iterator 
+	New source file: pixset.cc
+	
+	PixSet abstracts the operations on a set of pixel locations and
+	PixSet::Iterator provides a means to scan the contained locations
+	in the set (I have followed the Java style for the iterator
+	instead of the C++ one).
+	
+	The first implementation of PixSet and PixSet::Iterator is based 
+	on the set<EPixel> structure as in the previous version; this is
+	a preliminary test before using a different approach.
+	
+	
+2005-07-01 (0.995)
+	- Traverser: Put some variables as instance member to avoid
+	  recomputation: pix_abs_area, pixelProportion_times_pix_abs_area.
+	  
+	- Traverser::rasterize_poly_QT revisited:
+		- all-discard case is now under the condition that pixelProportion > 0.0. 
+		- Fixed comparison in condition to include the whole envelope
+		- Traverser.h _Rect.lowerRight() fixed bug which generated the
+		  same rectangle representing a single pixel
+		These changes also fix bug #200097.
+	  
+	
+2005-06-18 (0.995)
+	STARSPAN_VERSION only needs to be defined in one place: configure.in
+
+2005-06-18 (0.9941 - interim)
+	- CVS: removed generated files; new reconf script;
+	  mksrcdist.sh.in updated to create public distribution.
+	  
+	- some refactoring
+
+2005-06-06 (0.994)
+	- Added option --show-fields
+	- Elapsed time reported only if --verbose is given
+	
+2005-06-05 (0.994)
+	starspan.in: Fixed calls using the list of passed arguments; now
+	"$@" is used instead $*, which was wrong particularly to deal
+	with arguments containing spaces. Note also that just $@ 
+	(without the double quotes) won't work either.
+	
+2005-05-26 (0.994)
+	Version set to 0.994
+	Some minor documentation updates.
+	
+	Removed: --RID_as_given
+	Added: --RID {file | path | none}
+		Style for RID values in output.
+			file : the simple filename without path 
+			path : exactly as obtained from command line or field in vector 
+			none : no RID is included in output
+			
+	Updated: --csv now processing --RID
+	
+	Check --raster_directory is only given with --raster @field scheme.
+	
+2005-05-21 (0.994)
+	PATH in starspan{.in} was not set to include GDAL and GEOS's bin/
+	directories. Fixed.
+	
+	todo: check proper environment to run tests 
+	
+2005-04-28 (0.993)
+	Hack in starspan_myErrorHandler (starspan_util.cc) as a workaround
+	in current GDAL code which doesn't implement SetScale/SetOffset 
+	methods for some raster band types.  
+	
+	Traverser code cleanup (traverser.h, traverser.cc):
+	Removed old methods for rasterization of polygons:
+		processValidPolygon_FF(geos_poly)
+		processValidPolygon_BB(geos_poly)
+	Versions containing those methods are:
+	    traverser.h,v 1.9
+		traverser.cc,v 1.10
+		
+	starspan_countbyclass.cc: verbose messages and flush for each
+	finished feature.
+	
+	Note: configure doesn't set execution permission to script 
+	starspan. This flag is set by `make install' on destination.
+	For running the tests under tests/, I added a `chmod +x ../starspan'
+	to tests/Makefile. I discarded adding a `chmod +x starspan' to
+	configure.in (in AC_OUTPUT), as I'm not sure if that's portable.
+	   
+	
+2005-04-28 (0.99 -released)
+	Quadtree algorithm implemented for polygon rasterization:
+	New traverser/polyqt.cc.
+	Preliminary tests OK. The speedup over the flood-fill algorithm
+	with a polygon that	contains 22860 pixels is:
+	   time(flood-fill) / time(quadtree) = 98s/4s = 24.5 (!)
+	TODO: More tests; check the other goemetry types resulting from 
+	intersections that are ignored.
+	
+	starspan2.cc: shutdown calls to release resources: input data 
+	objects and calls to CPLPopErrorHandler() and geos::Unload::Release().
+
+	mksrcdist.sh: using my developer account to export from cvs
+	(currently anonymous access to casil is not working.)
+
+	Version released today: 0.99
+	
+2005-04-26 (0.98beta)
+	Changes committed.
+	Removed temporary NEW-SOURCES-PENDING-MERGE-COMMIT/.
+	Pending: configure regeneration.
+	
+2005-04-21 (*****  to-be 0.98beta   )
+	Traverser: Finally implemented a flood-filling algorithm to 
+	rasterize polygons. Temporary source files:(*)
+		NEW-SOURCES-PENDING-MERGE-COMMIT/traverser/traverser.h
+		NEW-SOURCES-PENDING-MERGE-COMMIT/traverser/traverser.cc
+		
+	Other minor changes also pending for merge and commit:
+		NEW-SOURCES-PENDING-MERGE-COMMIT/starspan_countbyclass.cc
+		
+	(*) cvs repository (on casil) is down now, so I'll wait
+	    until it's up again to update and commit actual sources... 
+
+2005-04-08 (0.97beta)
+	Setting up GNU build scheme:
+	
+	File renamings:
+		DEVNOTES.txt --> ChangeLog
+		README.txt   --> README
+		INSTALL.txt   --> INSTALL
+		starspan     --> starspan.in
+	New files:
+		configure.in
+		Makefile.am
+		AUTHORS
+		COPYING
+		NEWS
+		THANKS
+	Removed files:
+		Makefile.props.templ 
+		Makefile.props.fink
+		
+
+2005-04-04
+	New BUILD.windows.txt with notes about compiling the whole
+	system in windows
+
+2005-03-23 (0.963beta)
+	Makefile.props.templ: GDAL_SRC_DIR removed: we don't
+	need this any more as GDAL (from 1.2.6) already installs
+	vrtdataset.h in GDAL's PREFIX/include/.
+	
+	traverser.cc: Fixed a bug related to rerunning a traversal
+	on new rasters. In particular starspan_csv.cc works on a
+	raster at a time. The symptom was that the first specified
+	raster was processed OK but not the others in a command line
+	like this:
+	   starspan --raster R1 R2 ... --vector V --csv my.csv
+	The fix was in Traverser.removeRasters to add a call to
+	globalInfo.rasterPoly.empty(), which empties the contents
+	of the rasterPoly, so when addRaster is called, it gets
+	the new ring from the first given raster.
+	The news for end users is to say something like:
+	  Fixed a bug in --csv command on multiple rasters which
+	  made only the first given raster to be properly processed.
+	  
+	Hmm, while trying unsuccessfully my 'make test' target, I
+	noticed that GDAL 1.2.6 has a bug related with CreateCopy 
+	which call new methods SetOffset/SetScale; these methods
+	are not implemented for envi raster bands so they inherited
+	from GDALRasterBand wich fail with a CPLError; That explains
+	this new behaviour. I have notified the GDAL dev newsgroup 
+	about this situation to see what Frank says about that.
+	For now, the mini raster options ARE broken due to this
+	GDAL bug!
+	I just checkout the last gdal cvs snapshot and it seems
+	that the problem is still there (by looking at the code).
+
+2005-03-23 (0.962beta)
+	Usage message reorganized: testing and other developer
+	oriented options are shown with --help-dev.
+	
+	New method traverser.getPixelSetSize(), which is now
+	used in MiniRasterObserver.intersectionEnd().
+	
+	New static method Stats.computeCounts() to count the number of 
+	occurrences of each value in a vector<int>.
+	
+	Method Traverser.getPixelSet() removed. Other minor changes
+	to documentation in traverser.h.
+	
+	Added methods in Traverser:
+	  getPixelIntegerValuesInBand(unsigned band_index, vector<int>& list);
+	  getPixelDoubleValuesInBand(unsigned band_index, vector<double>& list);
+	which work on set of visited pixels in current feature.
+	
+	Removed methods in Traverser:
+	  getPixelIntegerValuesInBand(unsigned band_index, vector<CRPixel>* colrows, vector<int>& list);
+	  getPixelDoubleValuesInBand(unsigned band_index, vector<CRPixel>* colrows, vector<double>& list);
+	  
+	StatsObserver: eliminated list of pixels in current feature. This
+	functionality is already provided by the traverser.
+	
+	New option --count-by-class implemented in new observer
+	CountByClassObserver (starspan_countbyclass.cc). See starspan.h
+	for more information.
+	
+2005-03-04 (0.961beta)
+	starspan_update_csv.cc: simple printf-to-cout changes
+	Minor text updates in starspan script.
+	
+2005-02-26 (0.961beta)                  
+	Added option --separation <num-pixels> to include a	separation
+	between minirasters in strip. Feature request #200074.
+	
+	starspan_miniraster.cc: Since ENVI complains about "Unknown" projections
+	(which us the map info created by GDAL by default),	I decided to set
+	this projection explicitly by using the projection from the (arbitrarely
+	chosen) first miniraster. Now ENVI opens the generated strips without 
+	any complain. This fixes bug #200073
+	
+	--report now also shows projection info for rasters.
+	
+	starspan_miniraster.cc: workaround to GDAL bug which
+	generates repeated header items when FlushCache is called
+	multiple time on an ENVI dataset.
+	
+2005-02-19 (0.96beta)
+	--buffer <distance> [<quadrantSegments>]
+	If the parameter starts with '@', then it will be interpreted as the
+	name of the attribute from which the value will be obtained. Example:
+		--buffer @buf_distance 21
+	indicates that the buffer distance is to be taken from the field 
+	buf_distance in the corresponding geometry feature; the quadrantSegments
+	is fixed to 21.  This fulfills request #200066
+	
+	--mini_raster_parity {even | odd | @<field>}  
+	Implemented. This fulfills request #200069
+	
+	--mr renamed to --mini_rasters
+	
+	Tests pending for --buffer and --mini_raster_parity.
+	
+2005-02-19 (0.952beta)
+	- Making a source distribution. Example:
+		make dist VERSION=0.1                     
+	  which is the same as:
+	  	./mksrcdist.sh 0.1
+	- polygon/ moved to libtests/ and NOT added to cvs (this is old stuff).
+	- java/ moved to libtests/ and ADDED to cvs.
+
+2005-02-19 (0.951beta)
+	- new scheme to make source distribution (see mksrcdist.sh)
+	- source restructuring. These dirs were moved to src/:
+		csv jts raster rasterizers stats traverser util vector
+	
+2005-02-18 (0.95beta)
+	- Top-level sources moved to src/
+	
+2005-02-16 (0.95beta)
+	- 0.94beta released.
+	- starting 0.95beta
+
+2005-02-16 (0.94beta)
+	- minirasterstrip:
+		- fid strip now also created. I tried to use RasterIO
+		  documented capability of replicating a value; however it seems
+		  it's buggy so as a workaround I'm just making the buffer the same
+		  size of the region I want to fill with the replicated value.
+		  "Background" value for the fid strip is -1 as normally FIDs start
+		  from zero.
+		  
+		- loc strip now also created.  (background values x=y=0 --arbitrarely)
+		
+		- also set background value 0 for raster strip in all bands.
+		
+		Visual tests in Envi: OK
+		Added test case in tests/Makefile with comparison of data files.
+		For some reason .hdr  files are created with mapinfo repeated several 
+		times (gdal bug?)
+		
+	- Fixed a minor formatting in creation of filenames for minirasters to 
+	  keep compatibility with the way this used to be done with standard C: 
+		Now: ... << setfill('0') << setw(4) << FID ...
+		  
+	
+	
+2005-02-15 (0.94beta)
+	- mini raster strip command: implementation restarted based on
+	MiniRasterObserver. A subclass MiniRasterStripObserver uses a
+	list of basic info about each generated miniraster (mrbi_list)
+	to merge the minirasters into the final strip.
+	The basic functionality is now working (tested visually in envi).
+	Next: 
+		- create the accompanying .fid and .glt rasters.
+		- delete temporary minirasters
+		
+	(Note: starspan_miniraster_strip.cc no longer used; all this is
+	implemented in starspan_minirasters.cc)
+	
+	- Comments about --O and --outformat proposed variations in: 
+	http://casil.ucdavis.edu/tracker/?func=detail&aid=200072&group_id=48&atid=350112
+	
+	
+2005-02-12 (0.94beta)
+	- starting 0.94beta
+	- I just grabbed the last GDAL cvs snapshot and build a fresh gdal. I see
+	that vrtdataset.h (among others that used to be under frmts) are now siblings
+	of gdal.h under GDAL_PREFIX/include/.  So a future version of our Makefile
+	will use only the GDAL_PREFIX. (No more GDAL_SRC_DIR).
+
+	
+2005-02-11 (0.93beta)
+	- starting 0.93beta.
+	- New Makefile.props.fink (jgrn307)
+	- added INCLUDE += -I$(GDAL_SRC_DIR) in Makefile (jgrn307)
+	- More documentation in Makefile
+	- copyright.txt added
+	- README.txt now with a general description of the tool
+	- new doc/srccontents.txt (with old readme contents)
+	- TODO: clean up starspan script from particular settings!
+
+
+2005-02-10 (0.92beta)
+	- Makefile changes and new target `dist' to create a source distribution
+	  from current CVS repository. E.g:
+		make dist VERSION=0.92beta
+	  created:
+	  	DISTDIR/starspan-0.92beta.tar.gz
+	
+2005-02-07 (0.92beta)
+	- Starting to work on new --mini_raster_strip option.
+	  See starspan_miniraster_strip.cc (partially implemented)
+	  
+	- INSTALL.txt created (based on http://starspan.casil.ucdavis.edu/?Build)
+	
+2005-02-04 (0.92beta)
+	- setting up a test scheme: new directory tests/ and 
+	  tests/Makefile to apply tests. 
+	  New target `test' in master Makefile.
+	  
+	  Structure under tests/ is as follows:
+	  
+	  	data/           Contains all required raster, vector, and other data
+		                on which tests are to be performed.
+		expected/       Contains data used as expected outputs from starspan.
+		                Currently it contains data generated by starspan itself
+						but that have been checked externally with Envi.
+		generated/      This is created and populated by running the
+		                test cases in Makefile.
+						
+	  Currently the validation scheme is based on cmp-ing (binary comparing)
+	  the outputs in generated/ with corresponding expected outputs in
+	  expected/.
+	
+	- new --buffer option. Also included a basic test case.
+	  
+
+2005-02-02 (0.92beta)
+	- new traverser services to get access to set of visited pixel during
+	  current intersecting feature.
+	- miniraster using nodata value to nullify pixels outside geometries.
+
+2005-02-01 (0.92beta)
+	--nodata added
+
+2005-01-24 (0.92beta)
+	All options with double dash.
+	New option --version.
+	
+2005-01-24 (0.92beta)
+	starspan_minirasters.cc revisited: Now using traverser scheme
+	(first tests..)
+
+2005-01-23 (0.91beta)
+
+	Simplified dependencies scheme:
+	
+		- No more external dependency on AGG. Now the following AGG headers
+		(from the agg22.tar.gz distribution) are kept under rasterizers/
+			agg_basics.h
+			agg_dda_line.h
+		(even these headers will eventually be eliminated after a pending
+		revision of the line rasterizer.)
+
+		- DBF format support dropped: no more shapelib dependency.
+		The following sources are no longer maintained:
+			starspan_db.cc
+			starspan_update_dbf.cc
+			
+		In summary, the only dependencies are now GEOS and GDAL.
+
+2004-11-13
+	New options: -raster_field, -raster_directory
+	starspan_csv_raster_field.cc
+	Working only for points.
+	
+	MyPolygonizer eliminated; now geos::Polygonizer makes proper destruction.
+	
+	
+2004-11-12  ****
+Reverting to version at 2004-11-09  -- cvs -q update -D "2004-11-09"
+	P starspan.h
+	P starspan2.cc
+	P starspan_csv.cc
+	P starspan_jtstest.cc
+	P raster/Raster.h
+	P raster/Raster_gdal.cc
+	P traverser/traverser.cc
+	P traverser/traverser.h
+I'm keeping the previous scheme for multiple raster in traverser,
+but merging other changes I made:
+	
+	Ready.
+
+
+2004-11-12 (0.9beta)
+	starspan_csv: simplified scheme: each raster processed independently.
+	Output scheme:
+		FID, {vect-attrs}, RID, [col,row,] [x,y,] {rast-bands}
+	
+2004-11-10 (0.9beta)
+	Quote fields in CSV if necessary.
+	
+	Changes to allow the input rasters to be at different locations.
+	Do tests!
+	
+	
+
+2004-10-21 (0.89beta)
+	Some cleanup: Raster, Traverser, Stats.
+	To improve performance on computation of integers:
+		Traverser#getPixelIntegerValuesInBand(..)
+		Stats::compute(vector<int>& values)
+		StatsObserver now uses integer extraction if no band is of
+		floating point type. 
+		In particular, calculation of MODE should now be more efficient
+		because a map<int,int> is used.
+	
+	Traverser::summary with some counters for a summary report.
+	
+2004-10-20
+	More checks for malformed (WKT) geometries.
+	Such a problem generates a GEOS exception but starspan was not
+	catching it.
+	
+2004-10-18
+	Starting to use geos::Polygonizer as a means to fix bad polys.
+	(geos::Polygonizer is not yet in the 2.0.1 official release, I'm using
+	the CVS snapshop.)
+	The idea is to node the segments defining a "bad" (self-intersecting) 
+	polygon, and then polygonize the resulting multilinestring.
+	See Traverser#processPolygon().
+	Now working.  But there are some memory leaks associated with
+	Polygonizer..
+	
+	(my first test of Polygonizer was in java using JTS directly:  
+	See java/src/starspan/tools/PolygonizerTest.java.)
+	
+
+2004-10-14 (0.88beta)
+	New option -RID_as_given: by default, RIDs are the filenames without
+	any path. With this option RIDs will take the filenames exactly as
+	given in the command line.
+	
+	
+2004-10-12 (0.87beta)
+	Some cleanup and checks for memory leaks:
+		- StatsObserver.computeResults(): vector of values released.
+		- Traverser::processPolygon: geos_poly released.
+		- Traverser: pixset : Duplication of pixel is always checked
+		  for all intersections types except for polygons.  
+		  pixset is reset on a per feature basis, so potential duplication
+		  of pixels accross features won't be detected.
+		- There is a minor memory leak in GDAL 1.2.3 (geotiff.cpp:3787)
+		  that is already fixed in CVS. I will wait for next GDAL release.
+		  
+	Option -skip_invalid_polys. By default all polygons will be processed.
+		
+2004-10-11 (0.86beta)
+	Traverser::processPolygon: now catches GEOS exceptions which
+	may occur when a pixel is intersected with a self-intersecting
+	polygon; to be more specific it seems the problem arises when 
+	the self-intersection happens to be in the area involved in the 
+	pixel/poly intersection.
+	Currently the exceptions are just ignored so the process can
+	continue.
+	An environmental variable STARSPAN_DUMP_POLYS_ON_EXCEPTION controls
+	if the involved polygons should be WKT-printed to stderr.
+	An appropiated solution to this case is PENDING.
+	See http://geos.refractions.net/pipermail/geos-devel/2004-September/001045.html
+	
+	
+2004-10-08 (0.86beta)
+	new  util/Progress class.
+	Traverser: options for progress and verbose output.
+	
+	added Traverser::processMultiPolygon
+	added Traverser::processGeometryCollection
+	
+	Traverser::setVerbose
+	Traverser::setProgress
+	Traverser::setLog
+
+2004-10-07 (0.85beta)
+
+	traverser::processPolygon_point removed.  Now intersection
+	of pixels and polygons are only done according to proportion of
+	intersected area (0.5 by default).
+	(previous revisions: traverser.cc,v 1.34,  traverser.h,v 1.25)
+	
+	GDAL note:  Use -D_FILE_OFFSET_BITS=64 for C flags before
+	./configure'ing GDAL in case large file support (LFS) is not working
+	properly.  (I fixed this kind of problem on pavo machine today.)
+
+2004-10-06 (0.84beta)
+	New scheme for -calbase command:
+	-calbase linkname output.csv stat1 stat2 ...
+	-vector V                 : with field linkname (eg. Cal_ID)
+	-speclib F                : csv format:  linkname,1,2,...,m
+	-raster R1 ...            : images
+	
+	stat1 stat2 ... are optional desired statistics from rasters; by
+	default AVG is calculated
+
+	This is based on the following additions/changes:
+
+	New method Traverser#setDesiredFeatureByField(fieldname, fieldvalue).
+	New starspan_getFeatureStatsByField
+	starspan_tuct2.cc: entry point: starspan_tuct_2(...)
+	First tests: OK
+	
+	New scheme for stats calculation: now based on a band-oriented fashion,
+	which should be more efficient according to GDAL model although efficiency
+	also depends on the specific interleave of raster datasets; in particular
+	BSQ is the preferred interleave for band-wise calculations.
+	Included "mode" statistic.
+
+2004-10-04 (0.83beta)
+	starspan_stats.cc: new starspan_getFeatureStats(FID,vect,rast,stats)
+	to get statistics for FID in raster rast. StatsObserver was adjusted
+	to support the new service.
+	
+	starspan_tuct1.cc: code for new ''-calbase outfile'' command. 
+	This command expects inputs -vector V, -raster R1 R2 ..., 
+	and (new) -speclib F.
+	starspan create outfile in CSV format with the following scheme:
+		FID,RID,BandNumber,FieldBandValue,ImageBandValue
+		
+2004-09-30 (0.82beta)
+	starspan_stats: bug fixed: I was calling pixels.empty() instead
+	of pixels.clear()!
+	
+	select_fields is now a pointer to a vector.
+	
+	-stats: now it also process selection of fields (-fields ...)
+	
+2004-09-29 (0.81beta)
+
+	-dump_geometries: new testing operation (implemented in
+	starspan_dump.cc) to generate plot of geometries and raster extent.
+	This provides a better control on visualization. 
+	Output format is the textual form accepted by the Ptolemy Plot
+	library, http://ptolemy.eecs.berkeley.edu/java/ptplot/ .
+	A new extended usage option --view_geometries launches the
+	ptplotapplication tool.
+	
+	typical usage:
+		starspan -vector V -raster R -dump_geometries mygeometries.csv
+		starspan --view_geometries mygeometries.csv
+	
+	LineRasterizer: Now uses origin (x0,y0) to make a proper traslation
+	before calling the bresenham algorithm. Preliminary tests (via
+	--view_geometries) give now accurate results.
+	
+	Makefile.props.templ:  New scheme for Makefile.
+	This template is to create Makefile.props according to settings
+	in the local system.  Now Makefile includes Makefile.props.
+	A new property STARSPAN_PREFIX specifies where the starspan tool
+	will be installed.
+	
+	starspan shell script updated with better documentation about
+	Java archive dependencies (extended usage).
+	
+
+2004-09-28 (0.8beta)
+	StatsObserver: vector<Pixel> pixels (was vector<Pixel*>).
+	
+	getBandValues renamed to getBandValuesForPixel in both Raster and Traveser
+	classes.
+	
+2004-09-27 (0.8beta)
+	-update_{csv,dbf} options: fixed bug: col,row were not made 0-based for
+	proper extraction.
+	
+2004-09-26 (0.7beta)
+	pixel duplicates revisited:
+	
+		LineRasterizer#line now includes flag 'last' to indicate if ending
+		pixel should be reported.
+		
+		LineRasterizer: more tests to verify intersections by using
+		JTS test builder and Envi ...
+	
+2004-09-25
+	stats: fixed extraction bug: (col,row) were 1-based via TraversalEvent's, 
+	but then used as 0-based.
+	As a general revision, all (col,row) locations are now 0-based in traverser
+	module, and clients have been adjusted to report them as 1-based.
+	
+	building with GDAL 1.2.3 .. ok
+	
+2004-09-24
+	traverser: 
+		new Observer#end() to notify observer when process
+		has finished.
+	
+		now list of observers: addObserver instead of setObserver
+		
+	StatsObserver: new observer to compute basic statistics.
+	command-line scheme:
+		-stats [avg | stdev | min | max ]... file.csv
+		
+2004-09-16
+	starspan2.cc: collect args before creating main objects.
+	(arg processing might be based on getopt or similar in a future version.)
+	
+	New module csv to read CSV files--adapted from TPOP source code
+	http://cm.bell-labs.com/cm/cs/tpop/code.html
+	
+	New operation starspan_update_csv
+	New operation starspan_update_dbf
+	
+	(I started to use GDAL 1.2.2 which was just realeased today.)
+	
+	-envisl:  name for spectra: FID:col:row:x:y
+	
+	New options:
+		-noColRow: do not include col,row fields in -csv, -dbf
+		-noXY:     do not include x,y fields in -csv, -dbf
+	
+2004-09-13
+	General refactoring to allow the processing of multiple input rasters.
+	Traverser has now methods to specify data input objects; all object
+	interfaces updated.
+	
+	All output formats updated for multi raster processing:
+		-envi, -envisl: A check is done to verify that all bands are
+		                the same type.
+		
+		-jtstest: checks only one raster is specified.
+		
+		-mr: checks only one raster is specified; should be fixed for
+		multiple rasters but this is NOT going to be done for now.
+		    
+	
+	starspan_gen_envisl: 
+		Data file is basename.img for Envi image, and basename.sld for
+		spectral library.
+		In header for .img: samples = 1; lines = #pixels; bands = #bands
+		In header for .sld: samples = #bands; lines = #pixels; bands = 1
+		Note: data file is written out in exactly the same way (bip interleave).
+	
+2004-09-11
+	Problems with large file support; this is happening on ceres but
+	works fine on scorpio and px (my laptop). 
+	I'm also having a strange behavior with gdal not being able to 
+	recognize an envi image on scorpio, though it just reads fine on
+	ceres and px (?).
+	
+2004-09-10
+	Band# names now starting from 1.
+	
+	-envi:  creates envi image
+	-envisl:  creates envi spectral library
+	
+	Option -fields fieldname1,fieldname2,... to select fields from vector file.
+	In the case of envi output (-envi, -envisl), the following files will
+	be generated:
+	will generate:
+		<basename>_<fieldname1>.ser
+		<basename>_<fieldname2>.ser
+		...
+		
+	starspan_gen_envisl.cc #includes <list.h> although it should be <list>.
+	For some reason <list> does not compile on scorpio, gcc 3.3.4!
+	(<list> compiles just fine with my gcc 2.95.4).
+	
+	
+2004-09-09
+	TraversalEvent: (col,row) is now (1,1)-based (to be more
+	compatible with standard tools, e.g. envi).
+	
+	starspan_jtstest: new parameter use_polys to represent pixels as
+	polygons (rectangles) for visualization in the JTS test builder.
+	
+	Some cleaning up and minor refactoring before working on multiple
+	raster inputs.
+	
+2004-09-08
+	New option -csv to generate a CSV output file.
+	Option -db renamed to -dbf
+	
+	Traverser: new approach for pixel inclusion in intersections
+	resulting in polygons. A parameter pixelProprtion is used.
+	New option -pixprop.
+	Basic scheme implemented but should be adjusted for better 
+	efficiency.
+	New option -fid.
+	
+	JTS_TestGenerator: now a case can be cancelled, useful when empty
+	arguments are found.
+	
+2004-09-07
+	Complete build process revised and reported in
+	http://starspan.casil.ucdavis.edu/?Build
+	Makefile: GDAL_SRC_DIR to specify where GDAL sources are
+	installed. Other locations also specified via definitions.
+	NOTE: A more general scheme (maybe via configure) is
+	still required for a smooth build.
+	
+	New objects for traversal: TraversalEvent, PixelLocation
+	
+	starspan_db: now puts: FID, col,row, {vect-attrs}, {rast-bands}
+	See doc in starspan.h
+	
+2004-09-06
+	A second pass over the traverser module.
+	It now uses a LineRasterizer to process linestrings.
+	starspan_jtstest now implemented as a traverser client.
+	
+2004-09-05
+	rasterizers/ New module for rasterizations.
+	Now with a LineRasterizer, whose implementation is based on a
+	Bresenham interpolator with sub-pixel accuracy thanks to the
+	Anti-Grain Geometry engine, http://www.antigrain.com/.
+	Note that all that is needed for this dependency is to
+	#include agg_dda_line.h (no AGG library is required).
+	
+2004-08-31
+	-db now includes the fields, in the given order:
+		- (x,y)  location of signature
+		- attributes from source geometry feature
+		- band values
+		
+2004-08-30
+	Option -db to create a DBF with pixels contained in vector features.
+	Added some design documentation.
+	
+2004-08-22
+	New option -envisl to create en envi spectral library.
+	This function uses a traverser object.
+	Still lacking enough testing.
+	GDAL limitation: no access to wavelength metadata. 
+	It seems some ENVI functionality will have to be written anyway.
+	
+2004-08-21
+	New traverser module to provide a skeleton for basic processing.
+	The observer pattern is used so interested objects can perform
+	a number of tasks.
+
+2004-08-20
+	Option -in to work with -mr
+	
+2004-08-10
+	(unsuccessful) workarounds for proper projection in mini rasters
+	(beacuse of GDAL limitations).
+
+2004-08-08
+	organization
+	mini raster generation, option -mr
+
+2004-08-04
+	New jts module.
+	New option -jtstest that generates a JTS test suite.
+	starspan has started passing the first tests :-)
+
+2004-08-03
+	In order to have GEOS functionality from within GDAL I did
+	the following:
+	
+		Installed GEOS:
+			- ``cvs co geos''
+			- ./autogen.sh && ./configure && make && make install
+			  I fixed some minor errors about comparisons, but
+			  I hacked the Makefile to replace INTERFACE_* for
+			  arbitrary numbers. ;-(  I couldn't find any help about
+			  this error.  Finally it compiled
+			  
+		Installed GDAL:
+			- ``cvs checkout gdal''  to have the most recent GDAL source
+			  (since GEOS is not yet officially released).
+			- ./configure --with-geos=/usr/local/bin/geos-config
+			- ``make'' (I fixed some minor errors in ogrgeometry.cpp)
+			- ``make install''
+			
+	starspan2.cc: initial version with geom->Contains(point) and a very
+	simple report of points contained in the geometries of the vector datasource.
+			
+	
+
+2004-08-02
+	Working now on the C++ code.
+	New interface modules:
+		vector/Vector.h   with shapelib and OGR implementations
+		raster/Raster.h   with GDAL implementation
+
+2004-08-01
+	Geotools: I was not able to find a good Java library to work on
+	rasters in different formats (not even for Envi files). Although I have
+	written some code for Envi in BIP format (SAMS), I would spend a lot
+	of time writing the map management and the BSQ and BIL interleaves.
+	I'll continue with the C++ approach.
+	
+2004-07-29
+	First geotools tests OK ;-)
+	See java/README.txt
+	
+2004-07-28
+	GeoTools seems an interesting way to go:
+	  - http://docs.codehaus.org/display/GEOTOOLS/Data+access+basic+tutorial
+	    Data access basic tutorial -- shapefile example
+	Also JTS Topology Suite - http://www.vividsolutions.com/jts/JTSHome.htm
+	(in fact geotools uses JTS)
+	I'll try geotools ..
+	 
+
+	
+---- C/C++ code -----
+
+SHPLIB
+	Some tests to link against the shplib library:
+		make
+		export LD_LIBRARY_PATH=/usr/local/lib
+		./shpdump  # OK
+		
+CGAL
+	I installed CGAL-3.0.1 to support the implementation of
+	Polygon.h
+	
+	
+	
+-------- Original Message --------
+Subject: 	shapefile path
+Date: 	Fri, 23 Jul 2004 14:25:47 -0700
+From: 	Ramirez, Carlos <cmiramirez@ucdavis.edu>
+To: 	<carueda@ucdavis.edu>, <greenberg@ucdavis.edu>
+
+\\scorpio\cstars.ucdavis.edu\proj\delta\Delta2000004\gis\vector\shapefile 
+ 
+-------- Original Message --------
+Subject: 	last year's imagery
+Date: 	Fri, 23 Jul 2004 14:33:04 -0700
+From: 	Ramirez, Carlos <cmiramirez@ucdavis.edu>
+To: 	<carueda@ucdavis.edu>, <greenberg@ucdavis.edu>
+
+\\ceres.cstars.ucdavis.edu\home\gis-data\hyvista\delta_2003
+

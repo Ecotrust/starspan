@@ -1,0 +1,65 @@
+Win32 StarSpan DEVNOTES
+Carlos A. Rueda
+$Id: DEVNOTES.txt,v 1.5 2008-03-28 01:30:06 crueda Exp $
+
+In this directory we create a binary distribution of StarSpan for Windows.
+
+Build
+	- Once you have built the windows binaries, manually copy them
+	  in base_dist/bin/. The required files are:
+		libgeos_c-1.dll
+		libgeos-2.dll
+		libgdal-1.dll
+		ogrinfo.exe (*)
+		gdalinfo.exe
+		starspan2.exe
+
+	[(*) Originally created without extension--manually added]
+
+	- Check the values in build.properties according to location of 
+	  prerequisites in your system and also the indicate the
+      starspan version STARSPAN_VERSION property.
+	
+	- Create the package with only the command line files: 
+		ant cl
+	The ZIP takes the name starspan-${STARSPAN_VERSION}-win32.zip
+	
+	- Create the installer: 
+		ant installer
+	The executable takes the name install-starspan-win32-${VERSION}.jar
+	
+		
+Running:
+	After installation on a Windows machine, either use the file browser
+	to run DIR\bin\starspan-gui.bat, where DIR is the installation 
+	directory, or launch the shortcut created by the installer.
+	
+Status:
+	Experimental
+
+	
+Change log
+----------
+
+10/19/07 (version 0.2.0)
+	Build adjustments according to new progress on creating the
+	binaries with LFS:
+		- guie.jar (0.2.5) included as part of the base distribution:
+		  I created guie.jar from the distro in guie.sf.net and copied
+		  the jar: base_dist/bin/guie.jar
+		- Using IzPack 3.10.2
+		- build.{properties|xml} adjusted accordingly
+		- Added base_dist/img/splashi.png
+
+
+
+
+07/01/05 (version 0.1.1)
+	Bug #200096 fixed: Using GuiE 0.2.5 and setting multi="true" for
+	--fields in starspan.guie.
+
+06/14/05 (version 0.1.0)
+
+	First version. See ../../BUILD.windows.txt
+	
+

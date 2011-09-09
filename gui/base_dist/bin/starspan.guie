@@ -1,0 +1,466 @@
+<?xml version="1.0"?>
+<!-- $Id: starspan.guie,v 1.19 2008-07-20 06:03:49 crueda Exp $ -->
+<guie>
+
+<gui>
+	<frame title="StarSpan" splash="splash.png" x="250" y="50"/>
+    <tip format="html" style="width: 300px; border-spacing: 4px;" border="0" />
+	<panel axis="vertical"/>
+	<real width="6"/>
+	<integer width="6"/>
+	<string width="30"/>
+	<file width="80"/>
+</gui>
+
+<cldef>
+	<sequence name="StarSpan" prefix="starspan2">
+		<gui panel.axis="tabbed"/>
+        
+        <sequence name="Basic" required="no">
+            <sequence numsel="*" name="Inputs">
+                <file id="V" prefix="--vector" name="*">
+                    <gui panel.border="Input vector" tip.text="Specify the input vector file" description="Vector files">
+                        <button name="Metadata" action="view" tip.text="View general info about the file">
+                            <view contents="`starspan2 --vector ${V} --report`" rows="30" cols="80"/>
+                        </button>
+                    </gui>
+                </file>
+                <file id="R" prefix="--raster" name="*">
+                    <gui panel.border="Input raster(s)" height="6" multi="true" description="Raster files">
+                        <tip text="@">
+                            Specify the input raster files. You can select multiple files.
+                        </tip>
+                        <button name="Metadata" action="view"  tip.text="View general info about the file(s)">
+                            <view contents="`starspan2 --raster ${R} --report`" rows="30" cols="80"/>
+                        </button>
+                    </gui>
+                </file>
+                
+                <sequence>                    
+                    <gui panel.border="Output" panel.axis="vertical">
+                    </gui>
+                    
+                    <file prefix="--out-prefix" name="Output path and file prefix">
+                        <gui width="70"  tip.text="@" >
+                            The contents of this field is used as a prefix to name 
+                            the output(s) (depending on type of output).
+                            For example: <b><tt>c:\outputs\myprefix</tt></b>
+                        </gui>
+                    </file>
+                    
+                    
+                    <choice prefix="--out-type" name="Output format">
+                        <gui tip.text="@">
+                            The output type to generate. Go to the corresponding tab 
+                            for related options.
+                        </gui>
+                        <literal prefix="table"  name="Table"/>
+                        <literal prefix="mini_raster_strip" name="Miniraster strip"/>
+                        <literal prefix="mini_rasters"      name="Individual minirasters"/>
+                    </choice>
+                    
+                </sequence>
+                
+                
+            </sequence>
+            
+        </sequence>
+        
+        <sequence name="Advanced" required="no">
+        
+            <sequence  required="no">
+                <gui panel.border="" panel.axis="horizontal">
+                </gui>
+                
+                
+                <sequence numsel="*" name="Options">
+                    <gui panel.border="-" panel.axis="vertical">
+                    </gui>
+
+                    
+                    <real name="Nodata value" prefix="--nodata">
+                        <gui width="10" tip.text="@">
+                            Specifies a value to be interpreted as nodata indicator.
+                        </gui>
+                    </real>
+                    
+                    
+                    <string prefix="--duplicate" name="Modes">
+                        <gui multi="true" panel.border="Duplicate feature removal" height="4" width="40" tip.text="@">
+                            One or more duplicate pixel modes. The possible modes are:
+                            <ul>
+                              <li> <b>ignore_nodata all_bands</b>  </li>
+                              <li> <b>ignore_nodata any_band</b> </li>
+                              <li> <b>ignore_nodata  band</b> <i>number</i>  </li>
+                              <li> <b>distance</b> </li>
+                              <li> <b>direction</b> <i>angle</i> </li>
+                            </ul> 
+                            Note, if both <b>distance</b> and <b>direction</b> are given,
+                            they are applied in the given order.                       
+                            <p></p>
+                            Example: to ignore rasters with nodata in band 5 and apply
+                            the direction mode with an angle of 90 degrees:
+                            <p></p>
+                            <code>ignore_nodata 5 direction 90</code>
+                        </gui>
+
+                    </string>
+                    
+                    
+                    <sequence>
+                        <gui panel.border="Feature selection" panel.axis="vertical"  tip.text="@">
+                             These options operate on the vector datasource for
+                             the selection of features in a similar way as in  
+                             the OGR utility programs.                         
+                        </gui>
+                        
+                        <string prefix="--sql" name="SQL"> <gui width="30"/> 
+                        </string>
+                        <string prefix="--where" name="WHERE"> <gui width="30"/> 
+                            <gui tip.text="Example: SITE_ID >= 10"/>
+                        </string>
+                        <string prefix="--dialect" name="DIALECT"> <gui width="30"/> 
+                        </string>
+                        
+                    </sequence>
+                    
+                    
+                </sequence>
+                
+                <sequence numsel="*">
+                    <gui panel.border="-" panel.axis="vertical">
+                    </gui>
+                    
+                    
+                    
+                    
+                    <string prefix="--fid" name="Desired FID">
+                        <gui width="5" tip.text="Only the specified FID will be processed."/>
+                    </string>
+                    
+                    
+                    
+                    <flag prefix="--skip_invalid_polys" name="Skip invalid polygons">
+                        <gui tip.text="@">
+                            StarSpan will check each polygon for validity before rasterization. 
+                            If the polygon is invalid (according to a function provided by GEOS),
+                            then the polygon will be skipped. By default, all polygons are considered 
+                            for rasterization. Under some circunstances, the determination of
+                            intersected pixels may fail because of self intersecting polygons.
+                        </gui>
+                    </flag>
+                    
+                    <real prefix="--pixprop" name="Pixel proportion for inclusion" min="0" max="1">
+                        <gui panel.axis="horizontal" tip.text="@">
+                            Minimum proportion of pixel area in intersection so that the pixel is included.
+                            A value in [0.0, 1.0] must be given.
+                            Only used in intersections resulting in polygons. By default, the pixel proportion is 0.5.
+                        </gui>
+                    </real>
+                    <real prefix="--progress" name="Progress" min="1e-6">
+                        <gui width="5" tip.text="@">
+                            Show a progress indicator in increments of the given amount of percentage 
+                            (by default 10%).  This is based on the total number of geometry features
+                            in input vector datasource, which StarSpan can obtain in advance from some
+                            vector formats (e.g. shapefiles). Otherwise, a simple counting will be shown
+                            (in multiples of the given amount).
+                        </gui>
+                    </real>
+
+
+                    <string prefix="--buffer" name="Buffer">
+                        <gui width="20" multi="true" panel.axis="horizontal" tip.text="@">
+                            This option allows to specify a buffer
+                            operation. The buffer is applied to each feature
+                            before computing the intersection with the raster image.
+                            <br></br>
+                            <br></br>
+                            The format of this option is:
+                            <br></br>
+                            <i>distance</i> [ <i>segments</i> ]
+                            <br></br>
+                            <br></br>
+                            <i>distance</i> is given in the units associated to
+                            the geometry feature (not pixels).
+                            <br></br>
+                            If given, <i>segments</i> is the number of
+                            segments used to approximate a 90 degree
+                            quadrant of curvature. By default, 1.
+                        </gui>
+                    </string>
+                    
+                    <flag prefix="--elapsed_time" name="Report elapsed time">
+                        <gui tip.text="@">
+                            Prints the elapsed time and the end of the program.
+                        </gui>
+                    </flag>
+                    
+                    <flag prefix="--verbose" name="Verbose">
+                        <gui tip.text="@">
+                            Check this to show more information as the process is being performed.
+                        </gui>
+                    </flag>
+
+                </sequence>
+                
+                
+            </sequence>
+            
+            <file id="M" prefix="--maks" name="*">
+                <gui panel.border="Input mask(s)" height="6" multi="true" description="Mask raster files">
+                    <tip text="@">
+                        Masks for the input rasters.
+                    </tip>
+                    <button name="Metadata" action="view"  tip.text="View general info about the file(s)">
+                        <view contents="`starspan2 --raster ${M} --report`" rows="30" cols="80"/>
+                    </button>
+                </gui>
+            </file>
+		</sequence>
+		
+		
+		<sequence name="Table">
+            <string prefix="--table-suffix" name="Output suffix">
+                <gui panel.border="Table output" tip.text="@">
+                    Suffix to name the table with the extraction data.
+                    By default, <b>_table.csv</b>.
+                </gui>
+            </string>
+            
+            <sequence>
+                <gui panel.border="Summary" tip.text="@">
+                        Statistics generation.
+                        By default, the <b>avg</b> statistic is generated.
+                </gui>
+                <string prefix="--summary-suffix" name="Output suffix" >
+                    <gui tip.text="@">
+                        Suffix to name the summary file with the selected statistics.
+                        This takes a CSV format so a typical suffix will be something like
+                        <b>_summary.csv</b>
+                        <p></p>
+                        The summary is not created if this field is left empty.
+                    </gui>
+                </string>
+                <choice numsel="+" prefix="--stats" name="desired-stats" preselect="avg">
+                    <gui panel.axis="horizontal" tip.text="@">
+                        Specify the stats you want to compute
+                    </gui>
+                    <flag prefix="avg"/>
+                    <flag prefix="mode"/>
+                    <flag prefix="stdev"/>
+                    <flag prefix="min"/>
+                    <flag prefix="max"/>
+                    <flag prefix="sum"/>
+                    <flag prefix="median"/>
+                    <flag prefix="nulls"/>
+                </choice>
+            </sequence>
+            
+            
+            <string prefix="--class-summary-suffix" name="Output suffix">
+                <gui panel.border="Class summary" tip.text="@">
+                    Suffix to create a "count-by-class" summary table.
+                    By default, no class summary is generated.
+                </gui>
+            </string>
+            
+            <string prefix="--fields" name="Desired fields">
+                <gui width="40" multi="true">
+                    <tip text="@">
+                        Only the specified fields will be transferred from the given vector to the output.
+                        Use spaces to separate the field names.
+                        <br></br>
+                        <br></br>
+                        If the vector file has already been
+                        given, you can click on the button to select from the list of the existing fields.
+                        <br></br>
+                        <br></br>
+                        If no field from the vector metadata is desired, write <b>none</b> in this field.
+                        <br></br>
+                        By default, all fields will be extracted.
+                    </tip>
+                    <button name="Select" action="select" tip.text="Select fields from vector file">
+                        <select multi="yes" list="`starspan2 --vector ${V} --show-fields`" separator="\n"/>
+                    </button>
+                </gui>
+            </string>
+            
+            
+            <choice prefix="--RID" name="Raster Filename Output">
+                <gui tip.text="@">
+                    This is for the RID field included to identify the raster file
+                    pixel data are extracted from.
+                    By default, each RID is just the raster filename without any path.
+                    Use this option to specify how to include this info in the output.
+                </gui>
+                <literal prefix=""     name="[Filename only]"/>
+                <literal prefix="path" name="Full path and filename"/>
+                <literal prefix="none" name="No raster filename output"/>
+            </choice>
+
+            <flag prefix="--noColRow" name="Do not include fields col and row">
+                <gui tip.text="@">
+                    By default, the <b>col</b> and <b>row</b> columns are included.
+                </gui>
+            </flag>
+            <flag prefix="--noXY" name="Do not include fields x and y">
+                <gui tip.text="@">
+                    By default, the <b>x</b> and <b>y</b> columns are included.
+                </gui>
+            </flag>
+            
+            
+            <string prefix="--delimiter" name="Delimiter">
+            </string>
+            
+        </sequence>
+        
+        
+		<sequence name="Miniraster strip">
+            <string prefix="--box" name="Width and height">
+                <gui panel.border="Window" multi="true" panel.axis="horizontal" tip.text="@">
+                    A fixed box, centered with respect to the feature's bounding
+                    box, is used for extraction. 
+                    <br></br>
+                    <br></br>
+                    The format of this option is:
+                    <br></br>
+                    <i>width</i> [ <i>height</i> ]
+                    <br></br>
+                    <br></br>
+                    
+                    
+                    If the height is omitted, then
+                    the height will be equal to the width.
+                    <p></p>
+                    Simple numerical values are interpreted in the units
+                    associated with the vector dataset. To specify pixel units,
+                    add the “px” suffix to the value, for example:
+                    <p></p>
+                    <code> --box 200px 100px </code>
+                    <p></p>
+                </gui>                
+            </string>
+
+            <flag prefix="--in" name="Fill outside of polygon with nodata">
+                <gui tip.text="@">
+                    Pixels not contained in the geometry feature are nullified in the resulting mini raster
+                </gui>
+            </flag>
+            
+            <integer prefix="--separation" name="Vertical separation">
+                <gui tip.text="@">
+                    Mini rasters will be separated vertically by the given number of pixels.
+                    By default, 0.
+                </gui>
+            </integer>
+            
+            <string prefix="--mrst-img-suffix" name="Strip image suffix">
+                <gui tip.text="@">
+                    By default, <b>_mrst.img</b>
+                </gui>
+            </string>
+            
+            <string prefix="--mrst-shp-suffix"  name="Strip shapefile suffix">
+                <gui tip.text="@">
+                    By default, <b>_mrst.shp</b>
+                </gui>
+            </string>
+            
+            <string prefix="--mrst-fid-suffix"  name="Strip FID suffix">
+                <gui tip.text="@">
+                    By default, <b>_mrstfid.img</b>
+                </gui>
+            </string>
+            
+            <string prefix="--mrst-glt-suffix"  name="Strip GLT suffix">
+                <gui tip.text="@">
+                    By default, <b>_mrstglt.img</b>
+                </gui>
+            </string>
+            
+		</sequence>
+        
+
+        
+		<sequence name="Minirasters">
+            <string prefix="--box" name="Width and height">
+                <gui panel.border="Window" multi="true" panel.axis="horizontal" tip.text="@">
+                    A fixed box, centered with respect to the feature's bounding
+                    box, is used for extraction. 
+                    <br></br>
+                    <br></br>
+                    The format of this option is:
+                    <br></br>
+                    <i>width</i> [ <i>height</i> ]
+                    <br></br>
+                    <br></br>
+                    If the height is omitted, then
+                    the height will be equal to the width.
+                    <p></p>
+                    Simple numerical values are interpreted in the units
+                    associated with the vector dataset. To specify pixel units,
+                    add the “px” suffix to the value, for example:
+                    <p></p>
+                    <code> --box 200px 100px </code>
+                    <p></p>
+                </gui>
+            </string>
+
+            <flag prefix="--in" name="Fill outside of polygon with nodata">
+                <gui tip.text="@">
+                    Pixels not contained in the geometry feature are nullified in the resulting mini raster.
+                </gui>
+            </flag>
+            
+            <string prefix="--mr-img-suffix" name="Miniraster image suffix">
+                <gui tip.text="@">
+                    By default, <b>_mr</b>.
+                    <br></br>
+                    Note that <b>####.img</b> will be further appended to 
+                    create the name of each miniraster, where
+                    <b>####</b> is the associated FID.
+                </gui>
+            </string>
+            
+            <choice prefix="--mini_raster_parity" name="Miniraster parity">
+                <gui width="10" tip.text="@">
+                    "Parity" for the size of the minirasters.
+                </gui>
+                <literal prefix="" name="[None]"/>
+                <literal prefix="even"/>
+                <literal prefix="odd" />
+            </choice>
+        
+        </sequence>
+        
+        
+		<!-- An informative group -->
+		<sequence  name="Help" info="yes">
+			<gui panel.axis="tabbed"/>
+			<sequence name="StarSpan">
+				<gui panel.border="StarSpan help message"/>
+				<string >
+					<gui height="20" width="90" value="`starspan2 --help`"/>
+				</string>
+			</sequence>
+			<sequence name="Supported raster formats">
+				<gui panel.border="Raster formats as reported by 'gdalinfo --formats'"/>
+				<string >
+					<gui height="20" width="90" value="`gdalinfo --formats`"/>
+				</string>
+			</sequence>
+			<sequence name="Supported vector formats">
+				<gui panel.border="Vector formats as reported by 'ogrinfo --formats'"/>
+				<string >
+					<gui height="20" width="90" value="`ogrinfo --formats`"/>
+				</string>
+			</sequence>
+		</sequence>
+	
+	</sequence>
+	
+	
+</cldef>
+
+</guie>
