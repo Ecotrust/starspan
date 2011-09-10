@@ -403,12 +403,17 @@ const CoordinateSequenceFactory* global_cs_factory = global_factory->getCoordina
 // included.  
 //
 void Traverser::processPolygon(OGRPolygon* poly) {
+#if GEOS_VERSION_MAJOR <= 3 && GEOS_VERSION_MINOR < 3
 	Polygon* geos_poly = (Polygon*) poly->exportToGEOS();
+#else 
+	Geometry* geos_geom = (Geometry*) poly->exportToGEOS();
+	Polygon* geos_poly = dynamic_cast<Polygon*>( geos_geom );
+#endif
 	if ( geos_poly->isValid() ) {
-        // 2008-04-18
-        if ( geos_poly->getNumInteriorRing() > 0 ) {
-            cerr<< "--Valid polygon WITH interior rings: " <<geos_poly->getNumInteriorRing()<< endl;
-        } 
+		// 2008-04-18
+		if ( geos_poly->getNumInteriorRing() > 0 ) {
+		    cerr<< "--Valid polygon WITH interior rings: " <<geos_poly->getNumInteriorRing()<< endl;
+		} 
 		processValidPolygon(geos_poly);
 	}
 	else {
