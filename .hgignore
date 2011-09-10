@@ -1,0 +1,13 @@
+syntax:glob
+
+*.Po
+*.o
+Makefile
+config.log
+config.status
+mksrcdist.sh
+config.h
+stamp-h1
+starspan
+starspan2
+
