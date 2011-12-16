@@ -1,4 +1,4 @@
-StarSpan Readme
+# About Starspan
 
 StarSpan is designed to bridge the raster and vector worlds of spatial
 analysis using fast algorithms for pixel level extraction from
@@ -17,23 +17,31 @@ StarSpan should compile and run on most Unix flavor (including MacOs X
 and Windows via MinGW) although it has been mainly tested on Linux and
 MacOS X. StarSpan's core program is run from the command line. An
 experimental Java-based graphical user interface (GUI) is also
-available.
+available though no longer currently maintained.
 
-Installing StarSpan
--------------------
+# Installing StarSpan
+
 StarSpan requires the GDAL and GEOS libraries properly installed on 
-your system. For more details, see INSTALL.
+your system. 
+ 
+    git clone git://github.com/Ecotrust/starspan.git
+    cd starspan
+    ./configure 
+    make 
+    sudo make install
 
-Status and documentation 
------------------------- 
+For more details, see INSTALL.
+
+# Status 
+
 This is an open source software project and you are welcome to use the
 tool and contribute to this ongoing project. Please read the copyright
-agreement (copyright.txt). We encourage feature requests and bug
-reports, and these can be posted on the gforge website at:
-http://casil.ucdavis.edu/projects/starspan/ 
-The main website is located at: http://starspan.casil.ucdavis.edu/
+agreement (copyright.txt). 
 
+The original project was developed at UC Davis (formerly housed at
+http://casil.ucdavis.edu/projects/starspan/). The project is being moved
+to github, unfortunately without any of the CVS history. It is currently 
+being maintained by `perrygeo` with limited funding from Ecotrust.
 
---------------------------------------------------------
-$Id: README,v 1.5 2005-06-19 01:02:37 crueda Exp $
-
+Documentation, as you may notice, is very lacking. We hope to remedy this 
+in the future. Please bear with us as we make the transition.
