@@ -32,6 +32,24 @@ your system.
 
 For more details, see INSTALL.
 
+# Running StarSpan
+
+## Zonal Statistics
+A common use case for starspan is to summarize raster pixel values by vector geometries. 
+For instance, you may want to find the average NDVI value for each polygon in a shapefile. 
+
+    starspan --vector zonemap.shp --raster ndvi.tif --stats avg \
+    --out-prefix ndvi --out-type table --summary-suffix _stats.csv
+
+This would output a csv file named `test_stats.csv` which would provide statistics for each
+polygon feature, one per row.
+
+    FID,id,RID,numPixels,avg_Band1
+    0,1,ndvi.tif,2890,3.869815
+    2,3,ndvi.tif,225,4.781782
+    3,4,ndvi.tif,682,4.871310
+
+
 # Status 
 
 This is an open source software project and you are welcome to use the
