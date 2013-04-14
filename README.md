@@ -22,7 +22,7 @@ available though no longer currently maintained.
 # Installing StarSpan
 
 StarSpan requires the GDAL and GEOS libraries properly installed on 
-your system. Please note that starspan currently requires GEOS <= 3.2.x; GEOS 3.3+ will not work (see Wiki for details). 
+your system. Please note that starspan currently requires GEOS <= 3.2.x; GEOS 3.3+ will not work (see [wiki page](https://github.com/Ecotrust/starspan/wiki/GEOS-version-conflicts) for details). 
  
     git clone git://github.com/Ecotrust/starspan.git
     cd starspan
